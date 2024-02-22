@@ -1,8 +1,9 @@
 #!/bin/sh
 
-cd proto || exit 1
+cd common/proto || exit 1
 
 # Variables
+ROOT_FOLDER="../.."
 OUTPUT_FOLDER="out"
 DESCRIPTOR_FILE="protobuf.descriptor.bin"
 
@@ -37,7 +38,7 @@ run_protobuf_linter() {
 }
 
 run_protobuf_generator() {
-  printf "🛠️ Generating proto files...\n"
+  printf "🛠️  Generating proto files...\n"
   docker run --rm \
     --volume "$(pwd)":/workspace \
     --workdir /workspace \
@@ -53,7 +54,7 @@ run_protobuf_generator() {
 }
 
 run_protobuf_builder() {
-  printf "🛠️ Building proto descriptor...\n"
+  printf "🛠️  Building proto descriptor...\n"
   docker run --rm \
     --volume "$(pwd)":/workspace \
     --workdir /workspace \
@@ -67,10 +68,10 @@ copy_go_files() {
   printf "  🇬 Go\n"
 
   # find all go folders in ./integrations by checking if they have a go.mod
-  folders=$(find ../integrations -maxdepth 2 -name go.mod -exec dirname {} \;)
+  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name go.mod -exec dirname {} \;)
 
   # find all go folders in ./tools/kystrap/templates by checking if they have a go.mod
-  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name go.mod -exec dirname {} \;)"
+  folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name go.mod -exec dirname {} \;)"
 
   # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
@@ -90,13 +91,13 @@ copy_typescript_files() {
   printf "  🇹 Typescript\n"
 
   # find all typescript folders in ./integrations by checking if they have a package.json
-  folders=$(find ../integrations -maxdepth 2 -name package.json -exec dirname {} \;)
+  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name package.json -exec dirname {} \;)
 
   # find all typescript folders in ./tools/kystrap/templates by checking if they have a package.json
-  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name package.json -exec dirname {} \;)"
+  folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name package.json -exec dirname {} \;)"
 
   # add the common folder
-  folders="$folders,../common/protocol"
+  folders="$folders,"$ROOT_FOLDER"/common/protocol"
 
   # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
@@ -116,10 +117,10 @@ copy_python_files() {
   printf "  🐍 Python\n"
 
   # find all python folders in ./integrations by checking if they have a requirements.txt
-  folders=$(find ../integrations -maxdepth 2 -name requirements.txt -exec dirname {} \;)
+  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name requirements.txt -exec dirname {} \;)
 
   # find all python folders in ./tools/kystrap/templates by checking if they have a requirements.txt
-  folders="$folders,$(find ../tools/kystrap/templates -maxdepth 2 -name requirements.txt -exec dirname {} \;)"
+  folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name requirements.txt -exec dirname {} \;)"
 
   # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
@@ -137,8 +138,8 @@ copy_python_files() {
 
 copy_descriptor_file() {
   printf "  📄 Descriptor\n"
-  printf "    📁 Copy descriptor to ../tools/kystrap/%s\n" "${DESCRIPTOR_FILE}"
-  cp "$OUTPUT_FOLDER"/"$DESCRIPTOR_FILE" ../tools/kystrap/"$DESCRIPTOR_FILE"
+  printf "    📁 Copy descriptor to ./tools/kystrap/%s\n" "${DESCRIPTOR_FILE}"
+  cp "$OUTPUT_FOLDER"/"$DESCRIPTOR_FILE" "$ROOT_FOLDER"/tools/kystrap/"$DESCRIPTOR_FILE"
 }
 
 copy_files() {
