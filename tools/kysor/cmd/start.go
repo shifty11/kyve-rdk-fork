@@ -102,6 +102,9 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	}
 	expectedIntegrationDir := split[1]
 
+	// TODO: How should we name the runtime?
+	expectedRuntime = fmt.Sprintf("@kyvejs/integration/%s", expectedIntegrationDir)
+
 	pVersion, err := version.NewVersion(pool.Protocol.Version)
 	if err != nil {
 		return nil, nil, err
@@ -196,7 +199,8 @@ func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
 
 // pullRepo clones or pulls the kyvejs repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
-	repoName := "github.com/KYVENetwork/kyvejs"
+	//TODO: change this branch
+	repoName := "github.com/shifty11/kyvejs"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 
 	var repo *git.Repository
