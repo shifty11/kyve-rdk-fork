@@ -1,0 +1,11 @@
+name: On main push
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - '*'
+
+jobs:
+  releases:
+    uses: ./.github/workflows/releases.yml

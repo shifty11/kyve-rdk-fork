@@ -1,0 +1,15 @@
+name: Build docker images check
+
+on:
+  workflow_call:
+
+jobs:
+  build-docker-images:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      # Build docker images
+      - name: Build docker images
+        run: make docker-image
