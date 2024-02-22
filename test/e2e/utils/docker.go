@@ -32,15 +32,15 @@ const (
 	// runtimeImagePrefix is the prefix used for the runtime image name
 	runtimeImagePrefix = "runtime"
 	// kystrapTemplatesDir is the path to the templates folder
-	kystrapTemplatesDir = "../tools/kystrap/templates"
+	kystrapTemplatesDir = rootPath + "tools/kystrap/templates"
 	// kystrapMount is the mount path for the output folder in the kystrap container
 	kystrapMount = "/app/out"
 )
 
 var (
-	protocolImage = docker.Image{Path: "../../protocol/core", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
+	protocolImage = docker.Image{Path: rootPath + "protocol/core", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
 	testapiImage  = docker.Image{Path: "testapi", Tags: []string{"testapi"}, Labels: map[string]string{cleanupLabel: ""}}
-	kystrapImage  = docker.Image{Path: "../../tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
+	kystrapImage  = docker.Image{Path: rootPath + "tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
 )
 
 type IntegrationBuilder struct {

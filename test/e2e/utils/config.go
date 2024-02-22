@@ -13,7 +13,8 @@ import (
 
 // runtimePathRelative is the path to the runtime folder (relative to the root of the e2e test folder)
 const (
-	runtimePathRelative = "../../runtime"
+	rootPath            = "../../"
+	runtimePathRelative = rootPath + "runtime"
 	testdataPath        = "%s/testdata"
 	testdataApiPath     = testdataPath + "/api"
 )
