@@ -1,19 +1,25 @@
 #!/bin/sh
 
-# Set INTEGRATIONS_DIR
-INTEGRATIONS_DIR="$(pwd)"/integrations
-if [ ! -d "$INTEGRATIONS_DIR" ]; then
-  INTEGRATIONS_DIR="$(pwd)"/../../integrations
-fi
-if [ ! -d "$INTEGRATIONS_DIR" ]; then
-  echo "Could not find INTEGRATIONS_DIR folder"
+# Set RUNTIME_DIR
+RUNTIME_DIR=./runtime
+
+# Go up until the root of the project (max 2 levels)
+for _ in $(seq 1 2); do
+  if [ -d $RUNTIME_DIR ]; then
+    break
+  fi
+  cd ..
+done
+if ! [ -d $RUNTIME_DIR ]; then
+  printf "Could not find %s\n", "$RUNTIME_DIR"
   exit 1
 fi
 
 # Set KYSTRAP_DIR
-KYSTRAP_DIR="$(pwd)"/tools/kystrap
+KYSTRAP_DIR=./tools/kystrap
 if [ ! -d "$KYSTRAP_DIR" ]; then
-  KYSTRAP_DIR="$(pwd)"/../kystrap
+  printf "Could not find %s\n", "$KYSTRAP_DIR"
+  exit 1
 fi
 
 # check if -s flag is present anywhere in the arguments
@@ -56,7 +62,7 @@ if [ "$NON_INTERACTIVE" = true ]; then
     --user "$(id -u):$(id -g)"                    `# Run as current user` \
     --net="host"                                  `# Use host network` \
     --add-host=host.docker.internal:host-gateway  `# Add host.docker.internal to /etc/hosts` \
-    -v "$INTEGRATIONS_DIR":/app/out               `# Mount integrations folder` \
+    -v "$RUNTIME_DIR":/app/out                    `# Mount runtime folder` \
     kystrap $(echo "$@")                           # Pass all arguments to kystrap
 else
   docker run \
@@ -65,6 +71,6 @@ else
     --user "$(id -u):$(id -g)"                    `# Run as current user` \
     --net="host"                                  `# Use host network` \
     --add-host=host.docker.internal:host-gateway  `# Add host.docker.internal to /etc/hosts` \
-    -v "$INTEGRATIONS_DIR":/app/out               `# Mount integrations folder` \
+    -v "$RUNTIME_DIR":/app/out                    `# Mount runtime folder` \
     kystrap $(echo "$@")                           # Pass all arguments to kystrap
 fi

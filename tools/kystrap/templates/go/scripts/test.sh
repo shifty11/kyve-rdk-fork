@@ -3,7 +3,7 @@
 #########################################
 #               Variables               #
 #########################################
-# Key, config, and expected values (CHANGE THESE TO MATCH YOUR INTEGRATION!!!)
+# Key, config, and expected values (CHANGE THESE TO MATCH YOUR RUNTIME!!!)
 KEY=4943400
 API="https://rpc.kyve.network"
 CONFIG='{"network":"kyve-1","rpc":"'$API'"}'

@@ -71,7 +71,7 @@ func RunPromptCommandE(cmd *cobra.Command, args []string) error {
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "kystrap",
-	Short: "kystrap is a CLI tool to bootstrap KYVE integrations",
+	Short: "kystrap is a CLI tool to bootstrap KYVE runtimes",
 	RunE:  RunPromptCommandE,
 }
 

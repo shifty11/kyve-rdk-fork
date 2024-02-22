@@ -3,7 +3,7 @@
 #########################################
 #               Variables               #
 #########################################
-# CHANGE THESE TO MATCH YOUR INTEGRATION!!!
+# CHANGE THESE TO MATCH YOUR RUNTIME!!!
 URL=https://rpc.kyve.network                          # The URL to fetch data from
 INITIAL_VALUE=4943400                                 # The initial value to start from for each endpoint
 INCREMENT=1                                           # How much to increase the value by
