@@ -14,7 +14,7 @@ jobs:
       - name: 🐿 Setup Golang
         uses: actions/setup-go@v4
         with:
-          go-version-file: 'e2etest/go.mod'
+          go-version-file: 'test/e2e/go.mod'
       # Run e2e tests
       - name: Run e2e tests
         run: GOMAXPROCS=10 go test -v -timeout 30m ./...
