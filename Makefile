@@ -77,7 +77,7 @@ test-integration:
 # Runs the e2e tests in a local environment
 test-e2e: ensure_go_version
 	@echo "🧪 Running end-to-end tests..."
-	@cd e2etest && go test -test.v -test.parallel 10 -test.timeout 30m ./...
+	@cd test/e2e && go test -test.v -test.parallel 10 -test.timeout 30m ./...
 	@echo "✅ Completed end-to-end tests!"
 
 # Runs the e2e tests in a dind container (docker in docker)

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-E2ETEST_DIR=./e2etest
+E2ETEST_DIR=./test/e2e
 
 # Capture the first argument which will be passed to the e2e test
 arg="$1"
@@ -29,7 +29,7 @@ docker run \
     --privileged                             `# Run in privileged mode` \
     -d                                       `# Run in detached mode` \
     --name e2etest                           `# Name the container` \
-    -v ./integrations:/mnt/integrations:ro   `# Mount integrations folder` \
+    -v ./runtime:/mnt/runtime:ro             `# Mount runtime folder` \
     -v ./tools:/tools:ro                     `# Mount tools folder` \
     -v ./common:/common:ro                   `# Mount common folder` \
     -v e2etestvol:/var/lib/docker            `# Mount docker volume (to cache images)` \
@@ -44,11 +44,11 @@ for _ in $(seq 1 10); do
 done
 
 # Run e2e tests in docker container
-# Make a copy of integrations folder in the container
+# Make a copy of runtime folder in the container
 docker exec -it e2etest sh -c \
-  "rm -rf /integrations;
-  mkdir /integrations;
-  cp -r /mnt/integrations/* /integrations;
+  "rm -rf /runtime;
+  mkdir /runtime;
+  cp -r /mnt/runtime/* /runtime;
   ./e2etest -test.v -test.parallel 10 -test.timeout 30m $arg" || docker stop e2etest; echo "e2e tests failed!"; exit 1
 
 # Stop docker container
