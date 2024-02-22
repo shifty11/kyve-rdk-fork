@@ -67,8 +67,8 @@ run_protobuf_builder() {
 copy_go_files() {
   printf "  🇬 Go\n"
 
-  # find all go folders in ./integrations by checking if they have a go.mod
-  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name go.mod -exec dirname {} \;)
+  # find all go folders in ./runtime by checking if they have a go.mod
+  folders=$(find "$ROOT_FOLDER"/runtime -maxdepth 2 -name go.mod -exec dirname {} \;)
 
   # find all go folders in ./tools/kystrap/templates by checking if they have a go.mod
   folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name go.mod -exec dirname {} \;)"
@@ -90,14 +90,14 @@ copy_go_files() {
 copy_typescript_files() {
   printf "  🇹 Typescript\n"
 
-  # find all typescript folders in ./integrations by checking if they have a package.json
-  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name package.json -exec dirname {} \;)
+  # find all typescript folders in ./runtime by checking if they have a package.json
+  folders=$(find "$ROOT_FOLDER"/runtime -maxdepth 2 -name package.json -exec dirname {} \;)
 
   # find all typescript folders in ./tools/kystrap/templates by checking if they have a package.json
   folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name package.json -exec dirname {} \;)"
 
   # add the common folder
-  folders="$folders,"$ROOT_FOLDER"/common/protocol"
+  folders="$folders,$ROOT_FOLDER/protocol/core"
 
   # remove all old files in the proto folders
   for folder in $(echo "$folders" | tr "," "\n"); do
@@ -116,8 +116,8 @@ copy_typescript_files() {
 copy_python_files() {
   printf "  🐍 Python\n"
 
-  # find all python folders in ./integrations by checking if they have a requirements.txt
-  folders=$(find "$ROOT_FOLDER"/integrations -maxdepth 2 -name requirements.txt -exec dirname {} \;)
+  # find all python folders in ./runtime by checking if they have a requirements.txt
+  folders=$(find "$ROOT_FOLDER"/runtime -maxdepth 2 -name requirements.txt -exec dirname {} \;)
 
   # find all python folders in ./tools/kystrap/templates by checking if they have a requirements.txt
   folders="$folders,$(find "$ROOT_FOLDER"/tools/kystrap/templates -maxdepth 2 -name requirements.txt -exec dirname {} \;)"
