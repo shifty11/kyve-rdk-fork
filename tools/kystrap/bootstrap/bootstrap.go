@@ -87,7 +87,7 @@ func createFile(path string, outputPath string, data map[string]any, dirEntry os
 	return nil
 }
 
-func CreateIntegration(outputDir string, language types.Language, name string) error {
+func CreateRuntime(outputDir string, language types.Language, name string) error {
 	// Read the config file
 	if err := readConfig(name); err != nil {
 		return err
@@ -99,7 +99,7 @@ func CreateIntegration(outputDir string, language types.Language, name string) e
 
 	// Check if the output directory already exists
 	if _, err := os.Stat(outputPath); !os.IsNotExist(err) {
-		return errors.New("integration already exists")
+		return errors.New("runtime already exists")
 	}
 
 	// Create the output directory

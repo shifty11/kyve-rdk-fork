@@ -158,10 +158,10 @@ func promptAction(wasSuccess bool) (action, error) {
 	return action(result), nil
 }
 
-func CmdTestIntegration() *cobra.Command {
+func CmdTestRuntime() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "test",
-		Short:   "Test integration",
+		Short:   "Test runtime",
 		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Data (don't prompt if the flag was not set)
@@ -248,5 +248,5 @@ func CmdTestIntegration() *cobra.Command {
 }
 
 func init() {
-	rootCmd.AddCommand(CmdTestIntegration())
+	rootCmd.AddCommand(CmdTestRuntime())
 }

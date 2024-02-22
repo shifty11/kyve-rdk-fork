@@ -9,7 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -37,7 +37,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var globalCleanupLabel = "kysor-all"
+const (
+	// globalCleanupLabel labels all containers and images created by kysor. It can be used to remove all kysor containers and images
+	globalCleanupLabel = "kysor-all"
+	protocolPath       = "protocol/core"
+	runtimePath        = "runtime"
+)
 
 type Runtime struct {
 	RuntimeVersion  string
@@ -86,10 +91,10 @@ type kyveRef struct {
 	name string
 }
 
-// getRuntimeVersions returns the required protocol and integration versions for the given pool
+// getIntegrationVersions returns the required protocol and runtime versions for the given pool
 // protocol version: Latest patch version that is defined on-chain (ex: v1.1.0 -> v1.1.3)
-// integration version: Latest version (no constraints) -> TODO: save constraints on-chain and use them
-func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string, wantedProtocolVers *version.Version, wantedIntegrationVers *version.Version) (*kyveRef, *kyveRef, error) {
+// runtime version: Latest version (no constraints) -> TODO: save constraints on-chain and use them
+func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir string, wantedProtocolVers *version.Version, wantedRuntimeVers *version.Version) (*kyveRef, *kyveRef, error) {
 	tagrefs, err := repo.Tags()
 	if err != nil {
 		return nil, nil, err
@@ -100,10 +105,10 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 	if len(split) != 2 {
 		return nil, nil, fmt.Errorf("invalid runtime name: %s", expectedRuntime)
 	}
-	expectedIntegrationDir := split[1]
+	expectedRuntimeDir := split[1]
 
 	// TODO: How should we name the runtime?
-	expectedRuntime = fmt.Sprintf("@kyvejs/integration/%s", expectedIntegrationDir)
+	expectedRuntime = fmt.Sprintf("@kyvejs/integration/%s", expectedRuntimeDir)
 
 	pVersion, err := version.NewVersion(pool.Protocol.Version)
 	if err != nil {
@@ -131,10 +136,10 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 				latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, "@kyvejs/protocol@", protocolVersContraint)
 			}
 		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), expectedRuntime) {
-			if wantedIntegrationVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedIntegrationVers.String()) && ref.Target().IsTag() {
+			if wantedRuntimeVers != nil {
+				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedRuntimeVers.String()) && ref.Target().IsTag() {
 					latestRuntimeVersion = &kyveRef{
-						ver: wantedIntegrationVers,
+						ver: wantedRuntimeVers,
 						ref: ref,
 					}
 				}
@@ -155,16 +160,16 @@ func getRuntimeVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir stri
 		return nil, nil, fmt.Errorf("no protocol found for kyvejs/protocol@")
 	}
 	if latestRuntimeVersion == nil {
-		if wantedIntegrationVers != nil {
-			return nil, nil, fmt.Errorf("no runtime found for %s@%s", expectedRuntime, wantedIntegrationVers)
+		if wantedRuntimeVers != nil {
+			return nil, nil, fmt.Errorf("no runtime found for %s@%s", expectedRuntime, wantedRuntimeVers)
 		}
 		return nil, nil, fmt.Errorf("no runtime found for %s", expectedRuntime)
 	}
 
-	latestProtocolVersion.path = filepath.Join(repoDir, "common", "protocol")
-	latestRuntimeVersion.path = filepath.Join(repoDir, "integrations", expectedIntegrationDir)
+	latestProtocolVersion.path = filepath.Join(repoDir, protocolPath)
+	latestRuntimeVersion.path = filepath.Join(repoDir, runtimePath, expectedRuntimeDir)
 	latestProtocolVersion.name = "protocol"
-	latestRuntimeVersion.name = fmt.Sprintf("integration-%s", expectedIntegrationDir)
+	latestRuntimeVersion.name = fmt.Sprintf("runtime-%s", expectedRuntimeDir)
 
 	return latestProtocolVersion, latestRuntimeVersion, nil
 }
@@ -281,14 +286,14 @@ func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Cli
 	return docker.BuildImage(context.Background(), cli, image, docker.OutputOptions{ShowOnlyProgress: showOnlyProgress, PrintFn: printFn})
 }
 
-// buildImages builds the protocol and integration images
-func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, protocolVersion *version.Version, integrationVersion *version.Version, verbose bool) (*docker.Image, *docker.Image, error) {
+// buildImages builds the protocol and runtime images
+func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, protocolVersion *version.Version, runtimeVersion *version.Version, verbose bool) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	protocol, integration, err := getRuntimeVersions(kr.repo, pool, kr.dir, protocolVersion, integrationVersion)
+	protocol, runtime, err := getIntegrationVersions(kr.repo, pool, kr.dir, protocolVersion, runtimeVersion)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -298,9 +303,9 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
 		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	}
-	integrationImage := docker.Image{
-		Path:   integration.path,
-		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), integration.name, integration.ver.String())},
+	runtimeImage := docker.Image{
+		Path:   runtime.path,
+		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, runtime.ver.String())},
 		Labels: map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
@@ -310,12 +315,12 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 	}
 	fmt.Println("🏗️   Finished bulding image: " + protocolImage.Tags[0])
 
-	err = buildImage(w, integration.ref, cli, integrationImage, verbose)
+	err = buildImage(w, runtime.ref, cli, runtimeImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("🏗️   Finished bulding image " + integrationImage.Tags[0])
-	return &protocolImage, &integrationImage, nil
+	fmt.Println("🏗️   Finished bulding image " + runtimeImage.Tags[0])
+	return &protocolImage, &runtimeImage, nil
 }
 
 type StartResult struct {
@@ -323,10 +328,10 @@ type StartResult struct {
 	ID   string
 }
 
-// startContainers starts the protocol and integration containers
-func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, integration *docker.Image, label string, integrationEnv []string) (*StartResult, *StartResult, error) {
+// startContainers starts the protocol and runtime containers
+func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool *pooltypes.Pool, debug bool, protocol *docker.Image, runtime *docker.Image, label string, runtimeEnv []string) (*StartResult, *StartResult, error) {
 	protocolName := fmt.Sprintf("%s-%s", label, protocol.TagsLastPartWithoutVersion()[0])
-	integrationName := fmt.Sprintf("%s-%s", label, integration.TagsLastPartWithoutVersion()[0])
+	runtimeName := fmt.Sprintf("%s-%s", label, runtime.TagsLastPartWithoutVersion()[0])
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
@@ -335,7 +340,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Valaccount:  valConfig.Valaccount,
 		RpcAddress:  config.GetConfigX().RPC,
 		RestAddress: config.GetConfigX().REST,
-		Host:        integrationName,
+		Host:        runtimeName,
 		PoolId:      pool.Id,
 		Debug:       debug,
 		ChainId:     config.GetConfigX().ChainID,
@@ -360,11 +365,11 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
 	}
 
-	iConfig := docker.ContainerConfig{
-		Image:      integration.Tags[0],
-		Name:       integrationName,
+	rConfig := docker.ContainerConfig{
+		Image:      runtime.Tags[0],
+		Name:       runtimeName,
 		Network:    label,
-		Env:        integrationEnv,
+		Env:        runtimeEnv,
 		Labels:     map[string]string{globalCleanupLabel: "", label: ""},
 		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
@@ -380,22 +385,22 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		ID:   protocolId,
 	}
 
-	integrationId, err := docker.StartContainer(ctx, cli, iConfig)
+	runtimeId, err := docker.StartContainer(ctx, cli, rConfig)
 	if err != nil {
 		return nil, nil, err
 	}
 	fmt.Print("🚀  Started container ")
-	utils.PrintlnItalic(integrationName)
-	integrationResult := &StartResult{
-		Name: integrationName,
-		ID:   integrationId,
+	utils.PrintlnItalic(runtimeName)
+	runtimeResult := &StartResult{
+		Name: runtimeName,
+		ID:   runtimeId,
 	}
 
-	return protocolResult, integrationResult, nil
+	return protocolResult, runtimeResult, nil
 }
 
-func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
-	var integrationEnv []string
+func getRuntimeEnv(cmd *cobra.Command) ([]string, error) {
+	var env []string
 	envFile, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartEnvFile)
 	if err != nil {
 		return nil, err
@@ -410,10 +415,10 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 			return nil, fmt.Errorf("failed to load env file: %v", err)
 		}
 		for key, value := range k.All() {
-			integrationEnv = append(integrationEnv, fmt.Sprintf("%s=%v", key, value))
+			env = append(env, fmt.Sprintf("%s=%v", key, value))
 		}
 	}
-	return integrationEnv, nil
+	return env, nil
 }
 
 // printLogs prints the logs of the given container (stdout and stderr)
@@ -472,16 +477,16 @@ func printLogs(ctx context.Context, cli *client.Client, cont *StartResult, color
 	}
 }
 
-// start (or restart) the protocol and integration containers
+// start (or restart) the protocol and runtime containers
 func start(
 	ctx context.Context,
 	cmd *cobra.Command,
 	kyveClient *chain.KyveClient,
 	cli *client.Client,
 	valConfig config.ValaccountConfig,
-	integrationEnv []string,
+	runtimeEnv []string,
 	protocolVersion *version.Version,
-	integrationVersion *version.Version,
+	runtimeVersion *version.Version,
 	debug bool,
 	detached bool,
 	errChan chan error,
@@ -499,7 +504,7 @@ func start(
 	} else {
 		fmt.Println("    Starting KYSOR...")
 	}
-	fmt.Printf("    Running on platform and architecture: %s - %s\n\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("    Running on platform and architecture: %s - %s\n\n", goruntime.GOOS, goruntime.GOARCH)
 
 	homeDir, err := config.GetHomeDir(cmd)
 	if err != nil {
@@ -515,7 +520,7 @@ func start(
 
 	// Build images
 	label := valConfig.GetContainerLabel()
-	protocol, integration, err := buildImages(repo, cli, pool, label, protocolVersion, integrationVersion, debug)
+	protocol, runtime, err := buildImages(repo, cli, pool, label, protocolVersion, runtimeVersion, debug)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
 	}
@@ -527,7 +532,7 @@ func start(
 	}
 
 	// Start containers
-	protocolContainer, integrationContainer, err := startContainers(cli, valConfig, pool, debug, protocol, integration, label, integrationEnv)
+	protocolContainer, runtimeContainer, err := startContainers(cli, valConfig, pool, debug, protocol, runtime, label, runtimeEnv)
 	if err != nil {
 		return "", err
 	}
@@ -536,18 +541,18 @@ func start(
 		fmt.Println()
 		fmt.Println("🔍  Use following commands to view the logs:")
 		fmt.Print("    ")
-		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", integrationContainer.Name))
+		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", runtimeContainer.Name))
 		fmt.Print("    ")
 		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
 	} else {
 		// Print protocol logs
 		go printLogs(ctx, cli, protocolContainer, color.FgGreen, errChan)
 
-		// Print integration logs
-		go printLogs(ctx, cli, integrationContainer, color.FgBlue, errChan)
+		// Print runtime logs
+		go printLogs(ctx, cli, runtimeContainer, color.FgBlue, errChan)
 
 		// Check for new versions only if versions are not pinned
-		if protocolVersion == nil && integrationVersion == nil {
+		if protocolVersion == nil && runtimeVersion == nil {
 			fmt.Println("🔄  Auto update of docker container's is enabled")
 			go checkNewVersion(ctx, kyveClient, valConfig.Pool, repo, newVersionChan)
 		} else {
@@ -562,7 +567,7 @@ func start(
 // It also updates the local repository and pulls the latest changes
 // This function is blocking
 func checkNewVersion(ctx context.Context, kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}) {
-	var currentProtocol, currentIntegration *version.Version
+	var currentProtocol, currentRuntime *version.Version
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
 
@@ -579,7 +584,7 @@ func checkNewVersion(ctx context.Context, kyveClient *chain.KyveClient, poolId u
 			continue
 		}
 
-		protocolRef, integrationRef, err := getRuntimeVersions(kr.repo, response.GetPool().Data, kr.dir, nil, nil)
+		protocolRef, runtimeRef, err := getIntegrationVersions(kr.repo, response.GetPool().Data, kr.dir, nil, nil)
 		if err != nil {
 			fmt.Println("failed to get runtime versions: ", err)
 			continue
@@ -587,11 +592,11 @@ func checkNewVersion(ctx context.Context, kyveClient *chain.KyveClient, poolId u
 		if currentProtocol == nil {
 			currentProtocol = protocolRef.ver
 		}
-		if currentIntegration == nil {
-			currentIntegration = integrationRef.ver
+		if currentRuntime == nil {
+			currentRuntime = runtimeRef.ver
 		}
 
-		if protocolRef.ver.String() != currentProtocol.String() || integrationRef.ver.String() != currentIntegration.String() {
+		if protocolRef.ver.String() != currentProtocol.String() || runtimeRef.ver.String() != currentRuntime.String() {
 			newVersionChan <- nil
 		}
 
@@ -634,10 +639,10 @@ var (
 		Required:   false,
 		ValidateFn: validateVersion,
 	}
-	flagStartIntegrationVersion = commoncmd.StringFlag{
-		Name:       "integration-version",
-		Usage:      "Specify the version of the integration to run",
-		Prompt:     "Specify the version of the integration to run (leave empty for latest)",
+	flagStartRuntimeVersion = commoncmd.StringFlag{
+		Name:       "runtime-version",
+		Usage:      "Specify the version of the runtime to run",
+		Prompt:     "Specify the version of the runtime to run (leave empty for latest)",
 		Required:   false,
 		ValidateFn: validateVersion,
 	}
@@ -680,8 +685,8 @@ func startCmd() *cobra.Command {
 			}
 			valConfig := valaccOption.Value()
 
-			// Env vars
-			integrationEnv, err := getIntegrationEnv(cmd)
+			// Runtime env
+			runtimeEnv, err := getRuntimeEnv(cmd)
 			if err != nil {
 				return err
 			}
@@ -699,14 +704,14 @@ func startCmd() *cobra.Command {
 				}
 			}
 
-			// Integration version
-			var integrationVersion *version.Version
-			integrationVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartIntegrationVersion)
+			// Runtime version
+			var runtimeVersion *version.Version
+			runtimeVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeVersion)
 			if err != nil {
 				return err
 			}
-			if integrationVersionStr != "" {
-				integrationVersion, err = version.NewVersion(integrationVersionStr)
+			if runtimeVersionStr != "" {
+				runtimeVersion, err = version.NewVersion(runtimeVersionStr)
 				if err != nil {
 					return err
 				}
@@ -747,9 +752,9 @@ func startCmd() *cobra.Command {
 				kyveClient,
 				cli,
 				valConfig,
-				integrationEnv,
+				runtimeEnv,
 				protocolVersion,
-				integrationVersion,
+				runtimeVersion,
 				debug,
 				detached,
 				errChan,
@@ -798,9 +803,9 @@ func startCmd() *cobra.Command {
 							kyveClient,
 							cli,
 							valConfig,
-							integrationEnv,
+							runtimeEnv,
 							protocolVersion,
-							integrationVersion,
+							runtimeVersion,
 							debug,
 							detached,
 							errChan,
@@ -821,7 +826,7 @@ func startCmd() *cobra.Command {
 		},
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
-	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile, flagStartProtocolVersion, flagStartIntegrationVersion})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile, flagStartProtocolVersion, flagStartRuntimeVersion})
 	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartDetached})
 	return cmd
 }

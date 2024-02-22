@@ -62,12 +62,12 @@ proto-gen:
 ###    		                       Kystrap    		                        ###
 ###############################################################################
 
-# Run kystrap to create a new integration
-# Usage: make bootstrap-integration ARGS="--name my-integration -language go"
-bootstrap-integration:
+# Run kystrap to create a new runtime
+# Usage: make bootstrap-runtime ARGS="--name my-runtime -language go"
+bootstrap-runtime:
 	sh ./tools/kystrap/kystrap.sh create $(ARGS)
 
-test-integration:
+test-runtime:
 	sh ./tools/kystrap/kystrap.sh test $(ARGS)
 
 ###############################################################################

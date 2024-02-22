@@ -25,12 +25,12 @@ go run main.go
   The implementation is in `server/server.go` and contains already a running example.
   <br>
   ⚠️ **Note:**
-   The behaviour of the integration has to be **deterministic**.
+   The behaviour of the runtime has to be **deterministic**.
 
 <details>
 <summary>Runtime Workflow</summary>
 
-*Protocol* (client) and *integration* (server) run inside 2 docker containers and communicate via gRPC.
+*Protocol* (client) and *runtime* (server) run inside 2 docker containers and communicate via gRPC.
 1. *protocol* calls *GetRuntimeName* and *GetRuntimeVersion* to get the runtime name and version.
 2. *protocol* calls *ValidateSetConfig* to validate the configuration. Implementation specific config options can be set here.
 3. *protocol* calls *GetDataItem* to get the data item.
@@ -55,10 +55,10 @@ make test
 This will run the whole workflow like the protocol would do.<br>
 
 📌 **Task**
-- Make sure that your integration passes all tests. The tests are defined in `scripts/test.sh`. 
+- Make sure that your runtime passes all tests. The tests are defined in `scripts/test.sh`. 
 <br><br>
   **Note:**
-    You might want to run your integration in debug mode if you encounter any issues. 
+    You might want to run your runtime in debug mode if you encounter any issues. 
     It's out of scope of this README to explain how to do that (please refer to your IDE).
 
 <details>
@@ -125,7 +125,7 @@ The name of the file doesn't matter in this case.
 <details>
 <summary>Config</summary>
 Change the config in `testdata/config.yaml` to match your environment.
-The REST server with your testdata is reachable under `http://kyve-e2e-test-testapi-integration-{{ .name | ToLower }}:8080`
+The REST server with your testdata is reachable under `http://kyve-e2e-test-testapi-runtime-{{ .name | ToLower }}:8080`
 </details>
 
 📌 **Tasks**

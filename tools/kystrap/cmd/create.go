@@ -20,8 +20,8 @@ var (
 	flagLanguage = commoncmd.OptionFlag[types.Language]{
 		Name:     "language",
 		Short:    "l",
-		Usage:    fmt.Sprintf("Language for your integration (%s)", strings.Join(types.LanguagesStringSlice(), ", ")),
-		Prompt:   "Select the Language for your integration",
+		Usage:    fmt.Sprintf("Language for your runtime (%s)", strings.Join(types.LanguagesStringSlice(), ", ")),
+		Prompt:   "Select the Language for your runtime",
 		Required: true,
 		ValidateFn: func(input string) error {
 			if commoncmd.ValidateNotEmpty(input) != nil {
@@ -38,8 +38,8 @@ var (
 	flagName = commoncmd.StringFlag{
 		Name:     "name",
 		Short:    "n",
-		Usage:    "Name for your integration",
-		Prompt:   "Set a name for your integration",
+		Usage:    "Name for your runtime",
+		Prompt:   "Set a name for your runtime",
 		Required: true,
 		ValidateFn: func(input string) error {
 			if len(input) < 3 {
@@ -54,7 +54,7 @@ var (
 	flagOutput = commoncmd.StringFlag{
 		Name:         "output",
 		Short:        "o",
-		Usage:        "Output directory for your integration",
+		Usage:        "Output directory for your runtime",
 		DefaultValue: "out",
 	}
 )
@@ -70,10 +70,10 @@ func promptLinkToGithub() error {
 	return err
 }
 
-func CmdCreateIntegration() *cobra.Command {
+func CmdCreateRuntime() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "create",
-		Short:   "Create integration",
+		Short:   "Create runtime",
 		PreRunE: commoncmd.SetupInteractiveMode,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Output directory
@@ -98,12 +98,12 @@ func CmdCreateIntegration() *cobra.Command {
 				return err
 			}
 
-			// Create integration
-			err = bootstrap.CreateIntegration(outputDir, language, name)
+			// Create runtime
+			err = bootstrap.CreateRuntime(outputDir, language, name)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("✅ Successfully created integration in `%s`\n", name)
+			fmt.Printf("✅ Successfully created runtime in `%s`\n", name)
 			return nil
 		},
 	}
@@ -114,5 +114,5 @@ func CmdCreateIntegration() *cobra.Command {
 }
 
 func init() {
-	rootCmd.AddCommand(CmdCreateIntegration())
+	rootCmd.AddCommand(CmdCreateRuntime())
 }
