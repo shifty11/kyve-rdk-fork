@@ -293,10 +293,6 @@ func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label s
 		return nil, nil, err
 	}
 
-	// Todo: remove this for final release
-	protocol.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
-	integration.ref = plumbing.NewHashReference(plumbing.NewBranchReferenceName("rapha/dockerization-e2etest"), plumbing.NewHash("34e7d141505997910666e7327ea8d9ae4971723a"))
-
 	protocolImage := docker.Image{
 		Path:   protocol.path,
 		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
@@ -423,7 +419,7 @@ func getIntegrationEnv(cmd *cobra.Command) ([]string, error) {
 // printLogs prints the logs of the given container (stdout and stderr)
 // Errors are sent to the errChan and the name of the container is sent to the endChan when the logs end
 // This function is blocking
-func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute, errChan chan error, exitChan chan interface{}) {
+func printLogs(ctx context.Context, cli *client.Client, cont *StartResult, colorAttr color.Attribute, errChan chan error) {
 	logs, err := cli.ContainerLogs(context.Background(), cont.ID,
 		container.LogsOptions{ShowStdout: true, ShowStderr: true, Follow: true, Details: false})
 	if err != nil {
@@ -431,7 +427,6 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 		return
 	}
 
-	isRegularExit := false
 	reader := bufio.NewReader(logs)
 	for {
 		// Discard the 8-byte header
@@ -461,21 +456,25 @@ func printLogs(cli *client.Client, cont *StartResult, colorAttr color.Attribute,
 		fmt.Print(line)
 
 		select {
-		case <-exitChan:
-			isRegularExit = true
+		case <-ctx.Done():
+			return
 		default:
 			continue
 		}
 	}
 
-	// If we did not receive a signal to exit, the container stopped unexpectedly
-	if !isRegularExit {
-		errChan <- fmt.Errorf("container %s stopped unexpectedly", cont.Name)
+	select {
+	case <-ctx.Done():
+		return
+	default:
+		// If the context has not been canceled, the logs ended unexpectedly (which means the container died)
+		errChan <- fmt.Errorf("container %s stopped unexpectedly (ID: %s)", cont.Name, cont.ID)
 	}
 }
 
 // start (or restart) the protocol and integration containers
 func start(
+	ctx context.Context,
 	cmd *cobra.Command,
 	kyveClient *chain.KyveClient,
 	cli *client.Client,
@@ -486,7 +485,6 @@ func start(
 	debug bool,
 	detached bool,
 	errChan chan error,
-	exitChan chan interface{},
 	newVersionChan chan interface{},
 ) (string, error) {
 	response, err := kyveClient.QueryPool(valConfig.Pool)
@@ -543,15 +541,15 @@ func start(
 		utils.PrintlnItalic(fmt.Sprintf("docker logs -f %s", protocolContainer.Name))
 	} else {
 		// Print protocol logs
-		go printLogs(cli, protocolContainer, color.FgGreen, errChan, exitChan)
+		go printLogs(ctx, cli, protocolContainer, color.FgGreen, errChan)
 
 		// Print integration logs
-		go printLogs(cli, integrationContainer, color.FgBlue, errChan, exitChan)
+		go printLogs(ctx, cli, integrationContainer, color.FgBlue, errChan)
 
 		// Check for new versions only if versions are not pinned
 		if protocolVersion == nil && integrationVersion == nil {
 			fmt.Println("🔄  Auto update of docker container's is enabled")
-			go checkNewVersion(kyveClient, valConfig.Pool, repo, newVersionChan, exitChan)
+			go checkNewVersion(ctx, kyveClient, valConfig.Pool, repo, newVersionChan)
 		} else {
 			fmt.Println("🔄  Auto update of docker container's is disabled")
 		}
@@ -563,7 +561,7 @@ func start(
 // checkNewVersion checks if a new version is available and sends a signal to the newVersionChan if it is
 // It also updates the local repository and pulls the latest changes
 // This function is blocking
-func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}, exitChan chan interface{}) {
+func checkNewVersion(ctx context.Context, kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, newVersionChan chan interface{}) {
 	var currentProtocol, currentIntegration *version.Version
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
@@ -598,7 +596,7 @@ func checkNewVersion(kyveClient *chain.KyveClient, poolId uint64, kr *kyveRepo, 
 		}
 
 		select {
-		case <-exitChan:
+		case <-ctx.Done():
 			return
 		case <-ticker.C:
 			// Continue the loop
@@ -734,14 +732,17 @@ func startCmd() *cobra.Command {
 			defer cli.Close()
 
 			errChan := make(chan error)              // async error channel
-			exitChan := make(chan interface{}, 1)    // program exit's
 			newVersionChan := make(chan interface{}) // new version is available
+
+			ctx, cancel := context.WithCancel(context.Background())
+			defer cancel()
 
 			// Detached 	-> start containers and forget about them
 			// Not detached -> listen to signals and stop containers on signal
 			//              -> listen to new version and restart containers on new version
 			//   			-> listen to log end and throw error if log ends unexpectedly (which means the container died)
 			label, err := start(
+				ctx,
 				cmd,
 				kyveClient,
 				cli,
@@ -752,7 +753,6 @@ func startCmd() *cobra.Command {
 				debug,
 				detached,
 				errChan,
-				exitChan,
 				newVersionChan,
 			)
 			if err != nil {
@@ -769,8 +769,7 @@ func startCmd() *cobra.Command {
 
 				// Cleanup containers on exit
 				defer func() {
-					// Send exit signal
-					exitChan <- nil
+					cancel()
 
 					// Cleanup containers
 					if err := tearDownContainers(cli, label); err != nil {
@@ -788,7 +787,25 @@ func startCmd() *cobra.Command {
 					case <-newVersionChan:
 						// New version available, restart containers
 						fmt.Println("🔄  New version available, restarting KYSOR...")
-						label, err = start(cmd, kyveClient, cli, valConfig, integrationEnv, protocolVersion, integrationVersion, debug, detached, errChan, exitChan, newVersionChan)
+
+						cancel()
+						newCtx, newCancel := context.WithCancel(context.Background())
+						cancel = newCancel
+
+						label, err = start(
+							newCtx,
+							cmd,
+							kyveClient,
+							cli,
+							valConfig,
+							integrationEnv,
+							protocolVersion,
+							integrationVersion,
+							debug,
+							detached,
+							errChan,
+							newVersionChan,
+						)
 						if err != nil {
 							return err
 						}
