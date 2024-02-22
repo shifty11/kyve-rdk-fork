@@ -46,8 +46,8 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 	client, network := interchaintest.DockerSetup(t)
 
 	// Build the docker images
-	protocolBuilder := utils.NewProtocolBuilder(testName, log)
-	g.Expect(protocolBuilder.BuildIntegrations(testConfigs)).To(BeNil())
+	protocolBuilder := utils.NewIntegrationBuilder(testName, log)
+	g.Expect(protocolBuilder.BuildRuntimes(testConfigs)).To(BeNil())
 
 	// Start the chain
 	err = interchain.Build(ctx, nil, interchaintest.InterchainBuildOptions{
@@ -73,9 +73,9 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 	// Stake Alice's token to give her voting power
 	executor.DelegateToValidator(testConfigs[0].Alice.ProtocolNode, 9_000_000_000_000)
 
-	// Create one pool for every integration (per gov proposal)
+	// Create one pool for every runtime (per gov proposal)
 	for _, cfg := range testConfigs {
-		executor.CreatePool(cfg.Integration.Name, cfg.PoolConfig, testConfigs[0].Alice.ProtocolNode)
+		executor.CreatePool(cfg.Runtime.Name, cfg.PoolConfig, testConfigs[0].Alice.ProtocolNode)
 	}
 
 	// Wait for all pools to be created (gov proposals)
@@ -86,9 +86,9 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 		if len(pools) == expectedPoolCnt {
 			for _, pool := range pools {
 				for _, testConfig := range testConfigs {
-					if pool.GetData().Name == testConfig.Integration.Name {
+					if pool.GetData().Name == testConfig.Runtime.Name {
 						testConfig.PoolId = pool.GetData().Id
-						configuredConfigs[testConfig.Integration.Name] = nil
+						configuredConfigs[testConfig.Runtime.Name] = nil
 					}
 				}
 			}
@@ -107,8 +107,8 @@ func setup(t *testing.T, log *zap.Logger) ([]utils.TestConfig, string, *cosmos.C
 	return tcfgs, network, kyveChain, interchain, broadcaster
 }
 
-func removeFolders(tmpIntegrations []utils.TmpIntegration) error {
-	for _, tmp := range tmpIntegrations {
+func removeFolders(tmpRuntimes []utils.TmpRuntime) error {
+	for _, tmp := range tmpRuntimes {
 		if _, err := os.Stat(tmp.Path); os.IsNotExist(err) {
 			continue
 		}
@@ -120,12 +120,12 @@ func removeFolders(tmpIntegrations []utils.TmpIntegration) error {
 	return nil
 }
 
-func bootstrapTmpIntegrations(t *testing.T, log *zap.Logger, protocolBuilder *utils.ProtocolBuilder) {
+func bootstrapTmpRuntimes(t *testing.T, log *zap.Logger, protocolBuilder *utils.IntegrationBuilder) {
 	g := NewWithT(t)
-	err := protocolBuilder.BuildDependencies()
+	err := protocolBuilder.BuildCoreAndDeps()
 	g.Expect(err).To(BeNil())
 
-	tmpFolders, err := utils.GetTmpIntegrationDirectories()
+	tmpFolders, err := utils.GetTmpRuntimeDirectories()
 	g.Expect(err).To(BeNil())
 
 	// Cleanup any folders from previous runs
@@ -141,17 +141,17 @@ func bootstrapTmpIntegrations(t *testing.T, log *zap.Logger, protocolBuilder *ut
 	})
 
 	kystrapRunner := utils.NewKystrapRunner()
-	err = kystrapRunner.BootstrapTmpIntegrations(tmpFolders)
+	err = kystrapRunner.BootstrapTmpRuntimes(tmpFolders)
 
 	g.Expect(err).To(BeNil())
 	for _, tmpFolder := range tmpFolders {
-		g.Expect(tmpFolder.Path).To(BeADirectory(), "There is a problem with creating new integrations with kystrap")
+		g.Expect(tmpFolder.Path).To(BeADirectory(), "There is a problem with creating new runtimes with kystrap")
 	}
 }
 
 func TestProtocolNode(t *testing.T) {
 	log := zaptest.NewLogger(t)
-	protocolBuilder := utils.NewProtocolBuilder(testName, log)
+	protocolBuilder := utils.NewIntegrationBuilder(testName, log)
 	t.Cleanup(func() {
 		err := protocolBuilder.Cleanup()
 		if err != nil {
@@ -159,8 +159,8 @@ func TestProtocolNode(t *testing.T) {
 		}
 	})
 
-	// Create integrations for all available templates in kystrap
-	bootstrapTmpIntegrations(t, log, protocolBuilder)
+	// Create runtimes for all available templates in kystrap
+	bootstrapTmpRuntimes(t, log, protocolBuilder)
 
 	testConfigs, network, kyveChain, interchain, broadcaster := setup(t, log)
 
@@ -174,7 +174,7 @@ func TestProtocolNode(t *testing.T) {
 
 	for _, tc := range testConfigs {
 		testConfig := tc // This needs to be here because of the golang loopvar issue (should be fixed with go 1.22)
-		t.Run(fmt.Sprintf("Test protol runtime for %s", testConfig.Integration.Name), func(t *testing.T) {
+		t.Run(fmt.Sprintf("Test protol runtime for %s", testConfig.Runtime.Name), func(t *testing.T) {
 			// This will run the test in parallel
 			t.Parallel()
 			g := NewWithT(t)

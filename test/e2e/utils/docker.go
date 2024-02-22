@@ -29,8 +29,8 @@ const (
 	cleanupLabel = "kyve-e2e-test"
 	// interchainCleanupLabel is the label used to identify containers and volumes that should be cleaned up from interchaintest
 	interchainCleanupLabel = "ibc-test"
-	// integrationImagePrefix is the prefix used for the integration image name
-	integrationImagePrefix = "integration"
+	// runtimeImagePrefix is the prefix used for the runtime image name
+	runtimeImagePrefix = "runtime"
 	// kystrapTemplatesDir is the path to the templates folder
 	kystrapTemplatesDir = "../tools/kystrap/templates"
 	// kystrapMount is the mount path for the output folder in the kystrap container
@@ -38,28 +38,29 @@ const (
 )
 
 var (
-	protocolImage = docker.Image{Path: "../common/protocol", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
+	protocolImage = docker.Image{Path: "../../protocol/core", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
 	testapiImage  = docker.Image{Path: "testapi", Tags: []string{"testapi"}, Labels: map[string]string{cleanupLabel: ""}}
-	kystrapImage  = docker.Image{Path: "../tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
+	kystrapImage  = docker.Image{Path: "../../tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
 )
 
-type ProtocolBuilder struct {
+type IntegrationBuilder struct {
 	testName string
 	log      *zap.Logger
 }
 
-func NewProtocolBuilder(testName string, log *zap.Logger) *ProtocolBuilder {
-	return &ProtocolBuilder{
+func NewIntegrationBuilder(testName string, log *zap.Logger) *IntegrationBuilder {
+	return &IntegrationBuilder{
 		testName: testName,
 		log:      log,
 	}
 }
 
-func (pc *ProtocolBuilder) printToDebugLog(text string) {
+func (pc *IntegrationBuilder) printToDebugLog(text string) {
 	pc.log.Debug(text)
 }
 
-func (pc *ProtocolBuilder) BuildDependencies() error {
+// BuildCoreAndDeps builds the protocol, testapi and kystrap images
+func (pc *IntegrationBuilder) BuildCoreAndDeps() error {
 	// First, cleanup any old containers and volumes
 	err := pc.Cleanup()
 	if err != nil {
@@ -90,7 +91,7 @@ func (pc *ProtocolBuilder) BuildDependencies() error {
 	return nil
 }
 
-func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
+func (pc *IntegrationBuilder) BuildRuntimes(testConfigs []*TestConfig) error {
 	cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 	if err != nil {
 		return fmt.Errorf("failed to create docker client: %v", err)
@@ -98,31 +99,31 @@ func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
 
-	var integrationConfigs []docker.Image
+	var runtimeConfigs []docker.Image
 
-	// Find all subfolders in the integrations folder and build them
+	// Find all runtimes and build them
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5*time.Duration(len(testConfigs)))
 	defer cancel()
 
 	for _, cfg := range testConfigs {
-		// Create the volumes that will be shared between the integration and testapi containers
+		// Create the volumes that will be shared between the runtimes and testapi containers
 		_, err = cli.VolumeCreate(ctx, volume.CreateOptions{
-			Name:   kyveStorageVolumeName(cfg.Integration),
+			Name:   kyveStorageVolumeName(cfg.Runtime),
 			Labels: map[string]string{cleanupLabel: ""},
 		})
 		if err != nil {
 			return err
 		}
-		integrationConfigs = append(integrationConfigs, docker.Image{
-			Path:   cfg.Integration.Path,
-			Tags:   []string{integrationImage(cfg.Integration)},
+		runtimeConfigs = append(runtimeConfigs, docker.Image{
+			Path:   cfg.Runtime.Path,
+			Tags:   []string{runtimeImage(cfg.Runtime)},
 			Labels: map[string]string{cleanupLabel: ""},
 		})
 	}
 
 	// Build all the images concurrently
-	errChs := make([]chan error, len(integrationConfigs))
-	for i, img := range integrationConfigs {
+	errChs := make([]chan error, len(runtimeConfigs))
+	for i, img := range runtimeConfigs {
 		errChs[i] = make(chan error)
 		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.printToDebugLog})
 	}
@@ -136,7 +137,7 @@ func (pc *ProtocolBuilder) BuildIntegrations(testConfigs []*TestConfig) error {
 	return nil
 }
 
-func (pc *ProtocolBuilder) Cleanup() error {
+func (pc *IntegrationBuilder) Cleanup() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*5)
 	defer cancel()
 
@@ -193,9 +194,9 @@ type KystrapRunner struct {
 }
 
 func NewKystrapRunner() *KystrapRunner {
-	path, err := filepath.Abs(integrationsPath)
+	path, err := filepath.Abs(runtimePathRelative)
 	if err != nil {
-		panic(fmt.Errorf("failed to get absolute path for integrations folder: %v", err))
+		panic(fmt.Errorf("failed to get absolute path for runtime folder: %v", err))
 	}
 	binds := []string{fmt.Sprintf("%s:%s", path, kystrapMount)}
 	return &KystrapRunner{
@@ -231,9 +232,9 @@ func runDockerAndRemove(ctx context.Context, cli *client.Client, config docker.C
 	}
 }
 
-// BootstrapTmpIntegrations creates an integrations for the provided TmpIntegrations
-// The integrations will be created in the integrations folder
-func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegration) error {
+// BootstrapTmpRuntimes creates runtimes for the provided TmpRuntime's
+// The runtimes will be created in the runtime folder
+func (kr *KystrapRunner) BootstrapTmpRuntimes(tmpRuntimes []TmpRuntime) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 
@@ -249,7 +250,7 @@ func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegrati
 		return err
 	}
 
-	for _, tmp := range tmpIntegrations {
+	for _, tmp := range tmpRuntimes {
 		config := kr.kystrapConfig
 		config.Cmd = []string{"create", "-n", tmp.Name, "-l", tmp.Language, "-y"}
 		config.User = fmt.Sprintf("%s:%s", currentUser.Uid, currentUser.Gid)
@@ -263,37 +264,37 @@ func (kr *KystrapRunner) BootstrapTmpIntegrations(tmpIntegrations []TmpIntegrati
 }
 
 type ProtocolRunner struct {
-	testapiConfig     docker.ContainerConfig
-	integrationConfig docker.ContainerConfig
-	protocolConfigs   []docker.ContainerConfig
-	testConfig        TestConfig
-	sharedVolume      string
-	networkId         string
-	restAddress       string
-	rpcAddress        string
-	label             string
+	testapiConfig   docker.ContainerConfig
+	runtimeConfig   docker.ContainerConfig
+	protocolConfigs []docker.ContainerConfig
+	testConfig      TestConfig
+	sharedVolume    string
+	networkId       string
+	restAddress     string
+	rpcAddress      string
+	label           string
 }
 
 func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress string, rpcAddress string) *ProtocolRunner {
-	integrationImageName := integrationImage(testConfig.Integration)
-	integrationName := fmt.Sprintf("%s-%s-%s", cleanupLabel, integrationImagePrefix, testConfig.Integration.Name)
-	label := fmt.Sprintf("%s-%s", cleanupLabel, testConfig.Integration.Name)
+	runtimeImageName := runtimeImage(testConfig.Runtime)
+	runtimeName := fmt.Sprintf("%s-%s-%s", cleanupLabel, runtimeImagePrefix, testConfig.Runtime.Name)
+	label := fmt.Sprintf("%s-%s", cleanupLabel, testConfig.Runtime.Name)
 
 	var protocolConfigs []docker.ContainerConfig
 	for _, cfg := range testConfig.GetProtocolConfigs() {
-		name := fmt.Sprintf("%s-%s-%s-%s", cleanupLabel, protocolImage.Tags[0], integrationImageName, cfg.ProtocolNode.KeyName())
+		name := fmt.Sprintf("%s-%s-%s-%s", cleanupLabel, protocolImage.Tags[0], runtimeImageName, cfg.ProtocolNode.KeyName())
 		env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
 			Valaccount:  cfg.Valaccount.Mnemonic(),
 			RpcAddress:  rpcAddress,
 			RestAddress: restAddress,
-			Host:        integrationName,
+			Host:        runtimeName,
 			PoolId:      testConfig.PoolId,
 			Debug:       true,
 		})
 		if err != nil {
 			panic(fmt.Errorf("programming error! This should never happen! Error: %s", err))
 		}
-		binds := []string{fmt.Sprintf("%s:%s", kyveStorageVolumeName(testConfig.Integration), kyveStorageMountProtocol)}
+		binds := []string{fmt.Sprintf("%s:%s", kyveStorageVolumeName(testConfig.Runtime), kyveStorageMountProtocol)}
 		protocolConfigs = append(protocolConfigs, docker.ContainerConfig{
 			Image:   protocolImage.Tags[0],
 			Name:    name,
@@ -306,20 +307,20 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 	return &ProtocolRunner{
 		testapiConfig: docker.ContainerConfig{
 			Image:   testapiImage.Tags[0],
-			Name:    fmt.Sprintf("%s-%s-%s", cleanupLabel, testapiImage.Tags[0], integrationImageName),
+			Name:    fmt.Sprintf("%s-%s-%s", cleanupLabel, testapiImage.Tags[0], runtimeImageName),
 			Network: networkId,
-			Binds:   []string{fmt.Sprintf("%s:%s:ro", testConfig.Integration.TestDataApiPath, kyveStorageMountApi)},
+			Binds:   []string{fmt.Sprintf("%s:%s:ro", testConfig.Runtime.TestDataApiPath, kyveStorageMountApi)},
 			Labels:  map[string]string{cleanupLabel: "", label: ""},
 		},
-		integrationConfig: docker.ContainerConfig{
-			Image:   integrationImageName,
-			Name:    fmt.Sprintf("%s-%s", cleanupLabel, integrationImageName),
+		runtimeConfig: docker.ContainerConfig{
+			Image:   runtimeImageName,
+			Name:    fmt.Sprintf("%s-%s", cleanupLabel, runtimeImageName),
 			Network: networkId,
 			Labels:  map[string]string{cleanupLabel: "", label: ""},
 		},
 		protocolConfigs: protocolConfigs,
 		testConfig:      testConfig,
-		sharedVolume:    kyveStorageVolumeName(testConfig.Integration),
+		sharedVolume:    kyveStorageVolumeName(testConfig.Runtime),
 		networkId:       networkId,
 		restAddress:     restAddress,
 		rpcAddress:      rpcAddress,
@@ -327,12 +328,12 @@ func NewProtocolRunner(testConfig TestConfig, networkId string, restAddress stri
 	}
 }
 
-func integrationImage(integration Integration) string {
-	return fmt.Sprintf("%s-%s", integrationImagePrefix, integration.Name)
+func runtimeImage(runtime Runtime) string {
+	return fmt.Sprintf("%s-%s", runtimeImagePrefix, runtime.Name)
 }
 
-func kyveStorageVolumeName(integration Integration) string {
-	return fmt.Sprintf("%s-%s", kyveStorageName, integrationImage(integration))
+func kyveStorageVolumeName(runtime Runtime) string {
+	return fmt.Sprintf("%s-%s", kyveStorageName, runtimeImage(runtime))
 }
 
 func (pc *ProtocolRunner) RunProtocolContainers() error {
@@ -352,8 +353,8 @@ func (pc *ProtocolRunner) RunProtocolContainers() error {
 		return err
 	}
 
-	// Run integration
-	_, err = docker.StartContainer(ctx, cli, pc.integrationConfig)
+	// Run runtime
+	_, err = docker.StartContainer(ctx, cli, pc.runtimeConfig)
 	if err != nil {
 		return err
 	}

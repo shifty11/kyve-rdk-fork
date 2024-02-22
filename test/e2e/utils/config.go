@@ -11,11 +11,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// integrationsPath is the path to the integrations folder
+// runtimePathRelative is the path to the runtime folder (relative to the root of the e2e test folder)
 const (
-	integrationsPath = "../integrations"
-	testdataPath     = "%s/testdata"
-	testdataApiPath  = testdataPath + "/api"
+	runtimePathRelative = "../../runtime"
+	testdataPath        = "%s/testdata"
+	testdataApiPath     = testdataPath + "/api"
 )
 
 type poolConfigYml struct {
@@ -33,7 +33,7 @@ type PoolConfig struct {
 	Config   string `yaml:"config"`
 }
 
-type Integration struct {
+type Runtime struct {
 	Name            string
 	Path            string
 	TestDataPath    string
@@ -41,16 +41,16 @@ type Integration struct {
 }
 
 type TestConfig struct {
-	Alice       ProtocolConfig
-	Bob         ProtocolConfig
-	Viktor      ProtocolConfig
-	PoolId      uint64
-	PoolConfig  PoolConfig
-	Integration Integration
+	Alice      ProtocolConfig
+	Bob        ProtocolConfig
+	Viktor     ProtocolConfig
+	PoolId     uint64
+	PoolConfig PoolConfig
+	Runtime    Runtime
 }
 
-func getPoolConfig(integration Integration) (*PoolConfig, error) {
-	path, err := filepath.Abs(fmt.Sprintf("%s/config.yml", integration.TestDataPath))
+func getPoolConfig(runtime Runtime) (*PoolConfig, error) {
+	path, err := filepath.Abs(fmt.Sprintf("%s/config.yml", runtime.TestDataPath))
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +101,9 @@ func ensurePathExists(template string, basePath string) (string, error) {
 	return path, nil
 }
 
-// GetIntegrationDirs returns a list of all integration folder names
-func getIntegrations() ([]Integration, error) {
-	path, err := filepath.Abs(integrationsPath)
+// getRuntimes returns a list of all runtime folder names
+func getRuntimes() ([]Runtime, error) {
+	path, err := filepath.Abs(runtimePathRelative)
 	if err != nil {
 		return nil, err
 	}
@@ -112,55 +112,55 @@ func getIntegrations() ([]Integration, error) {
 		return nil, err
 	}
 
-	var integrationDirs []Integration
+	var runtimeDirs []Runtime
 	for _, entry := range dirEntries {
 		if entry.IsDir() {
-			integrationPath := filepath.Join(path, entry.Name())
-			testDataPath, err := ensurePathExists(testdataPath, integrationPath)
+			runtime := filepath.Join(path, entry.Name())
+			testDataPath, err := ensurePathExists(testdataPath, runtime)
 			if err != nil {
 				return nil, err
 			}
-			testDataApiPath, err := ensurePathExists(testdataApiPath, integrationPath)
+			testDataApiPath, err := ensurePathExists(testdataApiPath, runtime)
 			if err != nil {
 				return nil, err
 			}
-			integrationDirs = append(integrationDirs, Integration{
-				Path:            integrationPath,
+			runtimeDirs = append(runtimeDirs, Runtime{
+				Path:            runtime,
 				Name:            entry.Name(),
 				TestDataPath:    testDataPath,
 				TestDataApiPath: testDataApiPath,
 			})
 		}
 	}
-	return integrationDirs, nil
+	return runtimeDirs, nil
 }
 
 func GetTestConfigs() ([]*TestConfig, error) {
 	var testConfigs []*TestConfig
-	integrations, err := getIntegrations()
+	runtimes, err := getRuntimes()
 	if err != nil {
 		return nil, err
 	}
-	for _, integration := range integrations {
-		poolConfig, err := getPoolConfig(integration)
+	for _, runtime := range runtimes {
+		poolConfig, err := getPoolConfig(runtime)
 		if err != nil {
 			return nil, err
 		}
 		testConfigs = append(testConfigs, &TestConfig{
-			PoolConfig:  *poolConfig,
-			Integration: integration,
+			PoolConfig: *poolConfig,
+			Runtime:    runtime,
 		})
 	}
 	return testConfigs, nil
 }
 
-type TmpIntegration struct {
+type TmpRuntime struct {
 	Name     string
 	Path     string
 	Language string
 }
 
-func GetTmpIntegrationDirectories() ([]TmpIntegration, error) {
+func GetTmpRuntimeDirectories() ([]TmpRuntime, error) {
 	// Read Languages from directories in templates folder
 	// Every directory is a language
 	var languages []string
@@ -174,20 +174,20 @@ func GetTmpIntegrationDirectories() ([]TmpIntegration, error) {
 		}
 	}
 
-	iPath, err := filepath.Abs(integrationsPath)
+	iPath, err := filepath.Abs(runtimePathRelative)
 	if err != nil {
 		return nil, err
 	}
 
 	// Build the tmp folder names
-	var tmpIntegration []TmpIntegration
+	var tmpRuntimes []TmpRuntime
 	for _, language := range languages {
 		name := fmt.Sprintf("tmp-e2e-%s", language)
-		tmpIntegration = append(tmpIntegration, TmpIntegration{
+		tmpRuntimes = append(tmpRuntimes, TmpRuntime{
 			Name:     name,
 			Path:     fmt.Sprintf("%s/%s", iPath, name),
 			Language: language,
 		})
 	}
-	return tmpIntegration, nil
+	return tmpRuntimes, nil
 }
