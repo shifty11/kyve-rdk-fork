@@ -10,7 +10,7 @@ require (
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/creasty/defaults v1.7.0
 	github.com/docker/docker v25.0.2+incompatible
-	github.com/golangci/golangci-lint v1.52.2
+	github.com/golangci/golangci-lint v1.52.1
 	github.com/icza/dyno v0.0.0-20220812133438-f0b6f8a18845
 	github.com/onsi/gomega v1.30.0
 	github.com/strangelove-ventures/interchaintest/v7 v7.0.0

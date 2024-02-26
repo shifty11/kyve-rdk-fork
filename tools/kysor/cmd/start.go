@@ -144,7 +144,7 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 					}
 				}
 			} else {
-				latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s", runtimePrefix), nil)
+				latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, runtimePrefix, nil)
 			}
 		}
 		return nil
@@ -204,7 +204,7 @@ func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
 
 // pullRepo clones or pulls the kyve-rdk repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
-	//TODO: change this branch to github.com/KYVENetwork/kyve-rdk once it's ready
+	// TODO: change this branch to github.com/KYVENetwork/kyve-rdk once it's ready
 	repoName := "github.com/shifty11/kyve-rdk-fork"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 

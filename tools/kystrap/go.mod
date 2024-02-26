@@ -5,7 +5,7 @@ go 1.21.6
 require (
 	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240226172902-0f04e0efb7a3
 	github.com/fullstorydev/grpcurl v1.8.9
-	github.com/golangci/golangci-lint v1.55.2
+	github.com/golangci/golangci-lint v1.55.1
 	github.com/jhump/protoreflect v1.15.3
 	github.com/manifoldco/promptui v0.9.0
 	github.com/spf13/cobra v1.8.0

@@ -2,12 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"runtime"
+
+	"github.com/spf13/cobra"
 )
 
-var Version = "development"
-var Commit = "none"
+var (
+	Version = "(dev)"
+	Commit  = "(none)"
+)
 
 func versionCmd() *cobra.Command {
 	return &cobra.Command{
