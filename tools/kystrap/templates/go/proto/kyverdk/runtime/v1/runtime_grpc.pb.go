@@ -34,7 +34,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RuntimeServiceClient interface {
-	// Returns the name of the runtime. Example "@kyvejs/tendermint"
+	// Returns the name of the runtime. Example "runtime/tendermint"
 	GetRuntimeName(ctx context.Context, in *GetRuntimeNameRequest, opts ...grpc.CallOption) (*GetRuntimeNameResponse, error)
 	// Returns the version of the runtime. Example "1.2.0"
 	GetRuntimeVersion(ctx context.Context, in *GetRuntimeVersionRequest, opts ...grpc.CallOption) (*GetRuntimeVersionResponse, error)
@@ -172,7 +172,7 @@ func (c *runtimeServiceClient) NextKey(ctx context.Context, in *NextKeyRequest, 
 // All implementations must embed UnimplementedRuntimeServiceServer
 // for forward compatibility
 type RuntimeServiceServer interface {
-	// Returns the name of the runtime. Example "@kyvejs/tendermint"
+	// Returns the name of the runtime. Example "runtime/tendermint"
 	GetRuntimeName(context.Context, *GetRuntimeNameRequest) (*GetRuntimeNameResponse, error)
 	// Returns the version of the runtime. Example "1.2.0"
 	GetRuntimeVersion(context.Context, *GetRuntimeVersionRequest) (*GetRuntimeVersionResponse, error)
