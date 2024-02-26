@@ -67,7 +67,7 @@ jobs:
         run: echo "WORKING_DIR=$(echo ${{ matrix.docker }} | cut -d '@' -f 1)" >> $GITHUB_ENV
       # Set working directory
       - name: Set working directory
-        run: cd ${{ matrix.docker }}
+        run: cd ${{ env.WORKING_DIR }}
       # Tag docker image
       - name: Tag docker image
         uses: softprops/action-gh-release@v1
