@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/KYVENetwork/kyvejs/e2etest/utils"
+	"github.com/KYVENetwork/kyve-rdk/e2etest/utils"
 	sdkclient "github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"

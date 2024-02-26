@@ -20,7 +20,7 @@ if ! [ -d $E2ETEST_DIR ]; then
 fi
 
 # Build e2etest docker image
-docker build e2etest -t e2etest
+docker build $E2ETEST_DIR -t e2etest
 
 # Run docker image in privileged mode (required for docker-in-docker)
 # Use this only for local testing!!!
@@ -31,7 +31,7 @@ docker run \
     --name e2etest                           `# Name the container` \
     -v ./runtime:/mnt/runtime:ro             `# Mount runtime folder` \
     -v ./tools:/tools:ro                     `# Mount tools folder` \
-    -v ./common:/common:ro                   `# Mount common folder` \
+    -v ./protocol:/protocol:ro               `# Mount protocol folder` \
     -v e2etestvol:/var/lib/docker            `# Mount docker volume (to cache images)` \
     e2etest
 
