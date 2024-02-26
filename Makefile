@@ -76,15 +76,13 @@ test-runtime:
 
 # Runs the e2e tests in a local environment
 test-e2e: ensure_go_version
-	@echo "🧪 Running end-to-end tests..."
-	@cd test/e2e && go test -test.v -test.parallel 10 -test.timeout 30m ./...
-	@echo "✅ Completed end-to-end tests!"
+	@cd test/e2e && make test
 
 # Runs the e2e tests in a dind container (docker in docker)
-# This is useful for running tests in a CI environment
+# This is useful for running tests in a CI environment or for local testing
 test-e2e-dind:
 	@echo "🧪 Running end-to-end tests (dind)..."
-	@./e2etest/run-e2e-tests.sh
+	@./test/e2e/run-e2e-tests.sh
 	@echo "✅ Completed end-to-end tests (dind)!"
 
 ###############################################################################

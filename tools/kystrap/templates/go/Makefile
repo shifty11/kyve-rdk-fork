@@ -76,7 +76,7 @@ test:
 
 test-e2e:
 	@echo "🧪 Running end-to-end tests..."
-	@../../e2etest/run-e2e-tests.sh "-test.run '/{{ .name }}\$$'"
+	@../../test/e2e/run-e2e-tests.sh "-test.run '/{{ .name }}\$$'"
 	@echo "✅ Completed end-to-end tests!"
 
 ###############################################################################
@@ -84,7 +84,7 @@ test-e2e:
 ###############################################################################
 
 build: ensure_version
-	@echo "🏗️  Building binary..."
+	@echo "🐳 Building docker image..."
 	go build -o build/$(BINARY_NAME) .
 	@echo "✅ Completed binary build!"
 

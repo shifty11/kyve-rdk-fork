@@ -6,11 +6,12 @@ import (
 	"fmt"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/docker/docker/api/types/container"
 
-	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
+	"github.com/KYVENetwork/kyve-rdk/common/goutils/docker"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/volume"
@@ -128,10 +129,16 @@ func (pc *IntegrationBuilder) BuildRuntimes(testConfigs []*TestConfig) error {
 		docker.BuildImageAsync(context.Background(), cli, img, errChs[i], docker.OutputOptions{PrintFn: pc.printToDebugLog})
 	}
 
-	for _, errCh := range errChs {
+	for i, errCh := range errChs {
 		err := <-errCh
 		if err != nil {
-			return err
+			image := runtimeConfigs[i]
+			hint := ""
+			if strings.Contains(image.Path, "/tmp-e2e") {
+				hint = fmt.Sprintf("\nHint: Make sure the the templates in '%s' are up to date and the runtime is built correctly.",
+					kystrapTemplatesDir)
+			}
+			return fmt.Errorf("failed to build image %s: %v%s", image.Tags[0], err, hint)
 		}
 	}
 	return nil
