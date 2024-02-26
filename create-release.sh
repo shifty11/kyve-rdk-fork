@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Get the branch name based on the folder name
-# The branch name is in the format: @kyvejs/<folder_name>
-# For integrations it is in the format: @kyvejs/integrations/<folder_name>
-get_branch_basename() {
-  path=$1
-  folder_name=$(basename "$path")
-
-  # if the path starts with "integrations" then the branch name is in the format: @kyvejs/integration/<folder_name>
-  case $path in integrations*)
-      branch_name="@kyvejs/integration/$folder_name"
-      ;;
-    *)
-      branch_name="@kyvejs/$folder_name"
-      ;;
-  esac
-  echo "$branch_name"
-}
-
 # Check if the project in the given folder has any changes.
 # If there are changes, then the function returns 0, otherwise 1.
 has_changes()  {
@@ -169,8 +151,8 @@ release() {
 
   # List all projects and release them
   for project in $(list_projects); do
-    # Get basename of the branch. Example "@kyvejs/protocol"
-    basename=$(get_branch_basename "$project")
+    # Get basename of the branch. Example "protocol/core"
+    basename=$(basename "$project")
 
     # Get the latest tag for the branch
     latest_tag=$(get_latest_tag "$basename")
