@@ -111,7 +111,7 @@ check_if_has_uncommitted_changes() {
 
 # Create a release script and run it
 create_and_run_release_script() {
-  release_script="#!/bin/bash\n\n# HERE YOU CAN CHANGE THE VERSIONS"
+  release_script="#!/bin/bash\n\n# HERE YOU CAN CHANGE THE VERSIONS!!!"
   release_script="$release_script$release_data\n\n"
   release_script="$release_script"'git push --follow-tags origin main'
 
@@ -165,7 +165,8 @@ release() {
       echo "$project: $current_version -> $next_version"
 
       # Add a git command to create a new tag to the release script
-      release_data="$release_data\ngit tag -a \"$branch_name\" -m \"Release $branch_name\""
+      tag_var_name=$(echo "$project" | tr / _ | tr '[:lower:]' '[:upper:]')
+      release_data="$release_data\n# $tag_var_name\n$tag_var_name=$next_version\ngit tag -a \"$project@\$$tag_var_name\" -m \"Release \$$tag_var_name\""
     fi
   done
 
@@ -178,5 +179,5 @@ release() {
 }
 
 check_if_main_branch
-check_if_has_uncommitted_changes
+#check_if_has_uncommitted_changes
 release
