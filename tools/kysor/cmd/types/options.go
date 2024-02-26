@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
 	querytypes "github.com/KYVENetwork/chain/x/query/types"
 )

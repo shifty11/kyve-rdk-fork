@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/chain"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/go-bip39"
 	"github.com/manifoldco/promptui"

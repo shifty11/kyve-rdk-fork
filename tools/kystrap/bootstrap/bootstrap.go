@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/types"
 	"github.com/spf13/viper"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"

@@ -3,7 +3,7 @@ package types
 import (
 	"fmt"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/jhump/protoreflect/desc"
 	"google.golang.org/protobuf/reflect/protoreflect"

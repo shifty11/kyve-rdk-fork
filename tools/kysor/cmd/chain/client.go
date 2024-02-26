@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/KYVENetwork/chain/app"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"

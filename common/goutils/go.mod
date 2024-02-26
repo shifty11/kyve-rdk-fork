@@ -1,4 +1,4 @@
-module github.com/KYVENetwork/kyvejs/common/goutils
+module github.com/KYVENetwork/kyve-rdk/common/goutils
 
 go 1.21.6
 

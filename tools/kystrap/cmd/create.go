@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/bootstrap"
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/bootstrap"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
@@ -60,7 +60,7 @@ var (
 )
 
 func promptLinkToGithub() error {
-	const githubUrl = "https://github.com/KYVENetwork/kyvejs/issues/new"
+	const githubUrl = "https://github.com/KYVENetwork/kyve-rdk/issues/new"
 	prompt := promptui.Prompt{
 		Label:     fmt.Sprintf("Please create an issue on %s", githubUrl),
 		IsConfirm: true,

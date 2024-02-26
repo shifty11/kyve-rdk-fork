@@ -1538,7 +1538,7 @@ export const NextKeyResponse = {
  */
 export type RuntimeServiceService = typeof RuntimeServiceService;
 export const RuntimeServiceService = {
-  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
+  /** Returns the name of the runtime. Example "runtime/tendermint" */
   getRuntimeName: {
     path: "/kyverdk.runtime.v1.RuntimeService/GetRuntimeName",
     requestStream: false,
@@ -1678,7 +1678,7 @@ export const RuntimeServiceService = {
 } as const;
 
 export interface RuntimeServiceServer extends UntypedServiceImplementation {
-  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
+  /** Returns the name of the runtime. Example "runtime/tendermint" */
   getRuntimeName: handleUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>;
   /** Returns the version of the runtime. Example "1.2.0" */
   getRuntimeVersion: handleUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>;
@@ -1738,7 +1738,7 @@ export interface RuntimeServiceServer extends UntypedServiceImplementation {
 }
 
 export interface RuntimeServiceClient extends Client {
-  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
+  /** Returns the name of the runtime. Example "runtime/tendermint" */
   getRuntimeName(
     request: GetRuntimeNameRequest,
     callback: (error: ServiceError | null, response: GetRuntimeNameResponse) => void,
@@ -1929,6 +1929,7 @@ export const RuntimeServiceClient = makeGenericClientConstructor(
 ) as unknown as {
   new (address: string, credentials: ChannelCredentials, options?: Partial<ClientOptions>): RuntimeServiceClient;
   service: typeof RuntimeServiceService;
+  serviceName: string;
 };
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;

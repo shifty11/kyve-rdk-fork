@@ -65,7 +65,7 @@ yarn start
 
 Open another terminal and run
 ```bash
-# You must be in the root directory of kyvejs
+# You must be in the root directory of kyve-rdk
 yarn test:integration -a host.docker.internal:50051
 ```
 

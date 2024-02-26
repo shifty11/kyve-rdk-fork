@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"

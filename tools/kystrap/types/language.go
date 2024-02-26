@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 	"golang.org/x/text/cases"
 	lang "golang.org/x/text/language"
 )
