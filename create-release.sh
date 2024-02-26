@@ -67,7 +67,7 @@ get_current_version() {
   fi
 
   # Extract version from tag
-  version=$(echo "$tag" | awk -F'@' '{print $3}')
+  version=$(echo "$tag" | awk -F'@' '{print $2}')
 
   echo "$version"
 }
@@ -82,7 +82,7 @@ get_next_patch_version() {
   fi
 
   # Extract version from tag
-  version=$(echo "$tag" | awk -F'@' '{print $3}')
+  version=$(echo "$tag" | awk -F'@' '{print $2}')
 
   # Get the major, minor, and patch version
   major=$(echo "$version" | cut -d'.' -f1)
