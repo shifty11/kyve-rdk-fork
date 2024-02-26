@@ -5,7 +5,7 @@ on:
 
 jobs:
   prepare:
-    name: 'Prepare docker build'
+    name: 'prepare docker'
     runs-on: ubuntu-latest
     outputs:
       docker: ${{ steps.set-env.outputs.docker }}
