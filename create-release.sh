@@ -168,8 +168,8 @@ release() {
       echo "$project: $current_version -> $next_version"
 
       # Add a git command to create a new tag to the release script
-      tag_var_name=$(echo "$project" | tr / _ | tr '[:lower:]' '[:upper:]')
-      release_data="$release_data\n# $tag_var_name\n$tag_var_name=$next_version\ngit tag -a \"$project@\$$tag_var_name\" -m \"Release \$$tag_var_name\""
+      tag_var_name=$(echo "$project" | tr / _ | tr - _ | tr '[:lower:]' '[:upper:]')
+      release_data="$release_data\n# $tag_var_name\n$tag_var_name=$next_version\ngit tag -a \"$project@\$$tag_var_name\" -m \"Release $project \$$tag_var_name\""
     fi
   done
 
