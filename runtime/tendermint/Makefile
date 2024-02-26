@@ -6,3 +6,4 @@ format:
 	@echo "📝 Running formatter..."
 	@yarn format
 	@echo "✅ Completed formatting!"
+
