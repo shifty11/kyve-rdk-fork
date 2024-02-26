@@ -12,9 +12,7 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout the repository
-        uses: actions/checkout@main
-        with:
-          ref: 'main'
+        uses: actions/checkout@v4
       # Collect all directories with a Dockerfile and get their full path (exclude templates)
       - name: Collect docker targets
         id: collect
