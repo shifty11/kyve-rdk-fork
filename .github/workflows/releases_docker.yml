@@ -62,6 +62,9 @@ jobs:
       # Checkout the repository
       - name: Check out repository code
         uses: actions/checkout@v4
+      # Extract working directory ("runtime/tendermint-ssync@1.2.3" -> "runtime/tendermint-ssync")
+      - name: Extract working directory
+        run: echo "WORKING_DIR=$(echo ${{ matrix.docker }} | cut -d '@' -f 1)" >> $GITHUB_ENV
       # Set working directory
       - name: Set working directory
         run: cd ${{ matrix.docker }}
