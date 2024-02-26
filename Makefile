@@ -88,6 +88,22 @@ test-e2e-dind:
 	@echo "✅ Completed end-to-end tests (dind)!"
 
 ###############################################################################
+### 							 	Docker 							 		###
+###############################################################################
+
+# Builds the docker image for all modules (in parallel)
+build-docker-images:
+	@rm -f $(RESULT_FILE)
+	@set -e; for module in $(MODULES); do \
+	  if make -C $$module -n docker-image > /dev/null 2>&1; then \
+		{ $(MAKE) $$module.build-docker-image || echo $$? > $(RESULT_FILE); } & \
+	  fi; \
+	done; wait; if [ -f $(RESULT_FILE) ]; then exit `cat $(RESULT_FILE)`; fi
+
+%.build-docker-image:
+	@$(MAKE) -C $* docker-image
+
+###############################################################################
 ### 							 	Release 						 		###
 ###############################################################################
 

@@ -1,23 +1,5 @@
 #!/bin/bash
 
-# Get the branch name based on the folder name
-# The branch name is in the format: @kyvejs/<folder_name>
-# For integrations it is in the format: @kyvejs/integrations/<folder_name>
-get_branch_basename() {
-  path=$1
-  folder_name=$(basename "$path")
-
-  # if the path starts with "integrations" then the branch name is in the format: @kyvejs/integration/<folder_name>
-  case $path in integrations*)
-      branch_name="@kyvejs/integration/$folder_name"
-      ;;
-    *)
-      branch_name="@kyvejs/$folder_name"
-      ;;
-  esac
-  echo "$branch_name"
-}
-
 # Check if the project in the given folder has any changes.
 # If there are changes, then the function returns 0, otherwise 1.
 has_changes()  {
@@ -40,17 +22,17 @@ has_changes()  {
 # Returns a list of all projects that could be released.
 # The list is a space-separated string of all folders. Example "common/sdk common/types tools/kysor"
 list_projects() {
-  # List all subfolders of "common"
-  projects=$(find common/* -maxdepth 0 -type d)
+  # List all subfolders of "protocol"
+  protocol=$(find protocol/* -maxdepth 0 -type d)
 
-  # List all subfolders of "integrations"
-  integrations=$(find integrations/* -maxdepth 0 -type d)
+  # List all subfolders of "runtime"
+  runtime=$(find runtime/* -maxdepth 0 -type d)
 
   # List all subfolders of "tools"
   tools=$(find tools/* -maxdepth 0 -type d)
 
   # Merge all lists
-  echo "$projects $integrations $tools"
+  echo "$protocol $runtime $tools"
 }
 
 # Get the latest tag for a given branch name.
@@ -85,7 +67,7 @@ get_current_version() {
   fi
 
   # Extract version from tag
-  version=$(echo "$tag" | awk -F'@' '{print $3}')
+  version=$(echo "$tag" | awk -F'@' '{print $2}')
 
   echo "$version"
 }
@@ -100,7 +82,7 @@ get_next_patch_version() {
   fi
 
   # Extract version from tag
-  version=$(echo "$tag" | awk -F'@' '{print $3}')
+  version=$(echo "$tag" | awk -F'@' '{print $2}')
 
   # Get the major, minor, and patch version
   major=$(echo "$version" | cut -d'.' -f1)
@@ -151,17 +133,6 @@ create_and_run_release_script() {
   rm release.sh
 }
 
-# Check if the project is types or sdk
-# If it is, then return 0, otherwise 1
-check_if_is_types_or_sdk() {
-  folder=$1
-  if [ "$folder" = "common/types" ] || [ "$folder" = "common/sdk" ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 # Release all projects that have changes (except node projects)
 release() {
   local no_changes=true
@@ -169,31 +140,12 @@ release() {
 
   # List all projects and release them
   for project in $(list_projects); do
-    # Get basename of the branch. Example "@kyvejs/protocol"
-    basename=$(get_branch_basename "$project")
-
     # Get the latest tag for the branch
-    latest_tag=$(get_latest_tag "$basename")
+    latest_tag=$(get_latest_tag "$project")
 
     # Check if the project has any changes and if it does, then create a new tag
     if has_changes "$project" "$latest_tag"; then
       no_changes=false
-
-      # If the project is a node project, tell the user to run lerna version and exit
-      if check_if_is_types_or_sdk "$project"; then
-        echo "   Changes in $project detected."
-        echo "⚠️  Please run 'yarn lerna version' in the root folder and then run this script again"
-
-        # Ask the user if they want to continue
-        read -p "Do you want to continue? (y/N)" -r response
-        printf "\n"
-        if [[ $response =~ ^[Yy]$ ]]; then
-          continue
-        else
-          echo "Release aborted"
-          exit 1
-        fi
-      fi
 
       # Get current version
       current_version=$(get_current_version "$latest_tag")
@@ -202,7 +154,7 @@ release() {
       next_version=$(get_next_patch_version "$latest_tag")
 
       # Create the branch name
-      branch_name="$basename@$next_version"
+      branch_name="$project@$next_version"
 
       # If the latest tag is the same as the branch name, then skip the release
       if [ "$latest_tag" = "$branch_name" ]; then
@@ -210,7 +162,7 @@ release() {
       fi
 
       # Print changes
-      echo "$basename: $current_version -> $next_version"
+      echo "$project: $current_version -> $next_version"
 
       # Add a git command to create a new tag to the release script
       release_data="$release_data\ngit tag -a \"$branch_name\" -m \"Release $branch_name\""
