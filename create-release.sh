@@ -151,11 +151,8 @@ release() {
 
   # List all projects and release them
   for project in $(list_projects); do
-    # Get basename of the branch. Example "protocol/core"
-    basename=$(basename "$project")
-
     # Get the latest tag for the branch
-    latest_tag=$(get_latest_tag "$basename")
+    latest_tag=$(get_latest_tag "$project")
 
     # Check if the project has any changes and if it does, then create a new tag
     if has_changes "$project" "$latest_tag"; then
@@ -184,7 +181,7 @@ release() {
       next_version=$(get_next_patch_version "$latest_tag")
 
       # Create the branch name
-      branch_name="$basename@$next_version"
+      branch_name="$project@$next_version"
 
       # If the latest tag is the same as the branch name, then skip the release
       if [ "$latest_tag" = "$branch_name" ]; then
@@ -192,7 +189,7 @@ release() {
       fi
 
       # Print changes
-      echo "$basename: $current_version -> $next_version"
+      echo "$project: $current_version -> $next_version"
 
       # Add a git command to create a new tag to the release script
       release_data="$release_data\ngit tag -a \"$branch_name\" -m \"Release $branch_name\""
