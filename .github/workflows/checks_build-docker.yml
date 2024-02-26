@@ -45,5 +45,5 @@ jobs:
         run: cd ${{ matrix.docker }}
       # Build docker image
       - name: Build docker image
-        run: docker build -t ${{ matrix.docker }} .
+        run: docker build .
 
