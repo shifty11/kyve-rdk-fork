@@ -22,17 +22,17 @@ has_changes()  {
 # Returns a list of all projects that could be released.
 # The list is a space-separated string of all folders. Example "common/sdk common/types tools/kysor"
 list_projects() {
-  # List all subfolders of "common"
-  projects=$(find common/* -maxdepth 0 -type d)
+  # List all subfolders of "protocol"
+  protocol=$(find protocol/* -maxdepth 0 -type d)
 
-  # List all subfolders of "integrations"
-  integrations=$(find integrations/* -maxdepth 0 -type d)
+  # List all subfolders of "runtime"
+  runtime=$(find runtime/* -maxdepth 0 -type d)
 
   # List all subfolders of "tools"
   tools=$(find tools/* -maxdepth 0 -type d)
 
   # Merge all lists
-  echo "$projects $integrations $tools"
+  echo "$protocol $runtime $tools"
 }
 
 # Get the latest tag for a given branch name.
