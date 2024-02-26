@@ -34,7 +34,7 @@
 
 <br/>
 
-KYVE, the Web3 data lake solution, is a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams. By leveraging permanent data storage solutions like Arweave, KYVE’s Cosmos SDK chain creates permanent backups and ensures the scalability, immutability, and availability of these resources over time.
+KYVE, a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams, is a solution for Web3 data lakes. For more information on Web3 data lakes, [click here](link). By leveraging permanent data storage solutions like Arweave (a decentralized storage network) and KYVE’s Cosmos SDK chain (a framework for building blockchain applications in Go), we create permanent backups and ensure the scalability, immutability, and availability of these resources over time. For more information on Arweave, [click here](link). For more information on Cosmos SDK, [click here](link).
 
 ## Project Overview
 
@@ -43,10 +43,12 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
 - [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
 - [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
+- @kyvejs/goutils - go utility functions for this repository
 
 **Tools:**
 
 - [@kyvejs/kysor](tools/kysor/README.md) - The Cosmovisor of KYVE
+- [@kyvejs/kystrap](tools/kystrap/README.md) - A bootstrap tool for creating new KYVE integrations
 
 **Integrations:**
 
@@ -54,54 +56,48 @@ KYVE, the Web3 data lake solution, is a protocol that enables data providers to 
 - [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync integration
 - [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
 
-## Build Integration Binaries
+## What is a KYVE integration?
+A KYVE data validator requires a runtime to validate and store data. 
+A runtime consists of the protocol (client) and the integration (server).
+The protocol is responsible to communicate between the KYVE blockchain and the integration.
 
-Clone and checkout repository:
+//TODO: add picture of this workflow (Chain -> Protocol -> Integration) or link
 
+
+## How to write a KYVE integration
+
+You can choose to write an integration in Go, Python, or TypeScript. The following steps will guide you through the process of creating a new integration.
+
+**Prerequisites:**
+- [Docker](https://docs.docker.com/engine/install/)
+
+**Step 1:** Clone the repository and checkout a new branch
 ```bash
 git clone git@github.com:KYVENetwork/kyvejs.git
-cd kyvejs
+
+# Checkout a new branch
+# git checkout -b [feat/fix]/integration/[my-branch-name]
+git checkout -b feat/integration/fancypants
 ```
 
-Checkout desired version:
-
-```
-git checkout tags/@kyvejs/<integration>@x.x.x -b @kyvejs/<integration>@x.x.x
-```
-
-Example: `git checkout tags/@kyvejs/tendermint-bsync@1.0.0 -b @kyvejs/tendermint-bsync@1.0.0`
-
-Install dependencies and setup project:
-
-```
-yarn setup
-```
-
-Checkout integration and build binaries:
-
-```
-cd integrations/<integration>
-yarn build:binaries
-```
-
-The binaries can then be found in the `/out` folder
-
-## How to contribute
-
-Checkout new branch to implement new features/fixes there
-
+**Step 2:** Run kystrap
 ```bash
-git checkout -b [feat/fix]/[my-branch-name]
+# with make
+make bootstrap-integration
 ```
-
-Install dependencies and setup project:
-
 ```bash
-yarn setup
+# with a shell
+./tools/kystrap/kystrap.sh create
+```
+```bash
+# with yarn
+yarn bootstrap:integration
 ```
 
-Apply your changes and create a Pull Request to `main`. Once the team has
-reviewed and approved your PR it can be merged and used.
+Follow the instructions to create a new integration.
+The wizard will create a new folder in `integrations` with the integration name you provided.
+
+The new integration will contain a `README.md` with further instructions on how to get started.
 
 **NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
 

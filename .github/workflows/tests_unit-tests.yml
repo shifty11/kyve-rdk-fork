@@ -1,0 +1,19 @@
+name: unit tests
+
+on:
+  workflow_call:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "checkout repo"
+        uses: actions/checkout@v3
+      - name: "nodejs install"
+        uses: actions/setup-node@v3
+      - name: install yarn
+        run: npm install --global yarn
+      - name: "setup"
+        run: yarn setup
+      - name: "test"
+        run: yarn test
