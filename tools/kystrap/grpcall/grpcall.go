@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/types"
 	"github.com/fullstorydev/grpcurl"
 	"github.com/manifoldco/promptui"
 	"google.golang.org/grpc"

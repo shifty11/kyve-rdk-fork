@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
 	"golang.org/x/exp/maps"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
-	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	"github.com/KYVENetwork/kyve-rdk/common/goutils/docker"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
 )

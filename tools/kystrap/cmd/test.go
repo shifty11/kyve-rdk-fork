@@ -6,9 +6,9 @@ import (
 	"os"
 	"regexp"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/grpcall"
-	"github.com/KYVENetwork/kyvejs/tools/kystrap/types"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/grpcall"
+	"github.com/KYVENetwork/kyve-rdk/tools/kystrap/types"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"google.golang.org/protobuf/reflect/protoreflect"

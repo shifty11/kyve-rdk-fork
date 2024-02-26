@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
 	"github.com/manifoldco/promptui"
 

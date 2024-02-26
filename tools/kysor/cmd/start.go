@@ -18,14 +18,14 @@ import (
 
 	"github.com/docker/docker/api/types/container"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 
 	pooltypes "github.com/KYVENetwork/chain/x/pool/types"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/chain"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/config"
-	"github.com/KYVENetwork/kyvejs/tools/kysor/cmd/utils"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/chain"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 
-	"github.com/KYVENetwork/kyvejs/common/goutils/docker"
+	"github.com/KYVENetwork/kyve-rdk/common/goutils/docker"
 	"github.com/docker/docker/client"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"

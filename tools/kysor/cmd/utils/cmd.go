@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/savioxavier/termlink"
 
-	commoncmd "github.com/KYVENetwork/kyvejs/common/goutils/cmd"
+	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 	"github.com/spf13/cobra"
 )
 
