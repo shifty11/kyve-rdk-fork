@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
-	pb "github.com/KYVENetwork/kyvejs/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
+	pb "github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"reflect"
@@ -34,9 +34,9 @@ type {{ .name | ToPascal }}TransformedItemValue struct {
 	// Block interface{} `json:"block"`
 }
 
-// GetRuntimeName returns the name of the runtime. Example "@kyvejs/tendermint"
+// GetRuntimeName returns the name of the runtime. Example "runtime/tendermint"
 func (t *{{ .name | ToPascal }}Server) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
-	return &pb.GetRuntimeNameResponse{Name: "@kyvejs/{{ .name | ToLower }}"}, nil
+	return &pb.GetRuntimeNameResponse{Name: "runtime/{{ .name | ToLower }}"}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
@@ -66,7 +66,7 @@ func (t *{{ .name | ToPascal }}Server) ValidateSetConfig(ctx context.Context, re
 
 	// TODO: make changes to config if necessary
 	// Example:
-	// if value, exists := os.LookupEnv("KYVEJS_{{ .name | ToUpper }}_API"); exists {
+	// if value, exists := os.LookupEnv("KYVE_RUNTIME_{{ .name | ToUpper }}_API"); exists {
 	//	 config["rpc"] = value
 	// }
 

@@ -28,7 +28,7 @@ import { VoteType } from "./proto/kyve/bundles/v1beta1/tx";
 export class {{ .name | ToPascal }}Server implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
 
-  /** Returns the name of the runtime. Example "@kyvejs/tendermint" */
+  /** Returns the name of the runtime. Example "runtime/{{ .name }}" */
   getRuntimeName(call: ServerUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>, callback: sendUnaryData<GetRuntimeNameResponse>): void {
     callback(null, GetRuntimeNameResponse.create({ name }));
   }
@@ -62,8 +62,8 @@ export class {{ .name | ToPascal }}Server implements RuntimeServiceServer {
 
       // TODO: make changes to config if necessary
       // Example:
-      // if (process.env.KYVEJS_{{ .name | ToUpper }}_API) {
-      //   config.rpc = process.env.KYVEJS_{{ .name }}_API;
+      // if (process.env.KYVE_RUNTIME_{{ .name | ToUpper }}_API) {
+      //   config.rpc = process.env.KYVE_RUNTIME_{{ .name }}_API;
       // }
 
       const serialized_config = JSON.stringify(config);

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/KYVENetwork/kyvejs/integrations/{{ .name }}/server"
+	"github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}/server"
 )
 
 func main() {

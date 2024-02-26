@@ -1,4 +1,4 @@
-module github.com/KYVENetwork/kyvejs/integrations/{{ .name }}
+module github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}
 
 go {{ .lang.go.version.patch }}
 

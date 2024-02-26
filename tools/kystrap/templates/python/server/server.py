@@ -14,7 +14,7 @@ class {{ .name | ToPascal }}Server(RuntimeServiceBase):
     async def get_runtime_name(
             self, get_runtime_name_request: "GetRuntimeNameRequest"
     ) -> "GetRuntimeNameResponse":
-        """Returns the name of the runtime. Example \"@kyvejs/{{ .name }}\""""
+        """Returns the name of the runtime. Example \"runtime/{{ .name }}\""""
         return GetRuntimeNameResponse(name=settings.RUNTIME_NAME)
 
     async def get_runtime_version(
@@ -47,8 +47,8 @@ class {{ .name | ToPascal }}Server(RuntimeServiceBase):
 
             # TODO: make changes to config if necessary
             # Example:
-            # if os.environ.get(f"KYVEJS_{{ .name }}_API"):
-            #     config["rpc"] = os.environ[f"KYVEJS_{{ .name }}_API"]
+            # if os.environ.get(f"KYVE_RUNTIME_{{ .name }}_API"):
+            #     config["rpc"] = os.environ[f"KYVE_RUNTIME_{{ .name }}_API"]
 
             serialized_config = json.dumps(config)
             return ValidateSetConfigResponse(serialized_config)

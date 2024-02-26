@@ -1,2 +1,2 @@
-RUNTIME_NAME = '@kyvejs/{{ .name | ToLower }}'
+RUNTIME_NAME = 'runtime/{{ .name | ToLower }}'
 RUNTIME_VERSION = '{{ .version }}'
