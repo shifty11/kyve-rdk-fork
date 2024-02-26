@@ -116,3 +116,4 @@ docker-image:
 
 docker-run:
 	docker run -it --rm $(DOCKER_IMAGE_NAME):$(VERSION)
+
