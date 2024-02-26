@@ -8,7 +8,7 @@ jobs:
     name: 'Prepare docker build'
     runs-on: ubuntu-latest
     outputs:
-      docker: ${{ steps.collect.outputs.DOCKER }}
+      docker: ${{ steps.set-env.outputs.docker }}
     steps:
       # Checkout the repository
       - name: Checkout the repository
@@ -22,9 +22,16 @@ jobs:
         run: |
           DOCKER=$(find . -type f -name 'Dockerfile' -exec dirname {} \; | grep -v 'kystrap/templates' | jq --raw-input . | jq --slurp . | jq tostring)
           echo "::set-output name=DOCKER::$DOCKER"
+      # Print var
+      - name: Print var
+        run: |  
+          echo ${{ steps.collect.outputs.DOCKER }}
+      # Set var
+      - name: Set var
+        id: set-env
+        run: echo "::set-output name=docker::${{steps.collect.outputs.DOCKER}}"
 
   build-docker-image:
-    name: 'Release'
     runs-on: ubuntu-latest
     needs: prepare
     if: needs.prepare.outputs.docker != '[]'
