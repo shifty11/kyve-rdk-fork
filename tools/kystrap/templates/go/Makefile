@@ -84,7 +84,7 @@ test-e2e:
 ###############################################################################
 
 build: ensure_version
-	@echo "🏗️  Building binary..."
+	@echo "🐳 Building docker image..."
 	go build -o build/$(BINARY_NAME) .
 	@echo "✅ Completed binary build!"
 

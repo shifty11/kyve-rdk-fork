@@ -8,7 +8,7 @@ OUTPUT_FOLDER="out"
 DESCRIPTOR_FILE="protobuf.descriptor.bin"
 
 build_docker_image() {
-  printf "🏗️  Building docker image...\n"
+  printf "🐳 Building docker image...\n"
   docker build --rm \
     --tag kyve-protocol-proto:latest \
     --file Dockerfile . || exit 1
