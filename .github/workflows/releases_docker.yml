@@ -21,9 +21,10 @@ jobs:
       # Set tags if they point to the current commit
       - name: Set tag
         run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
-      # Collect all directories (except integrations) with a Dockerfile and NO release target
+      # Collect all directories with a Dockerfile and NO release target
+      # Ignore the release target because it will be released by the release-go workflow
       - name: Collect docker targets
-        run: echo "DOCKER=$(find protocol/ runtime/ tools/ -maxdepth 2 -type f -name 'Makefile' | xargs -n1 dirname | xargs -n1 basename | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+        run: echo "DOCKER=$(find protocol/ runtime/ tools/ -maxdepth 2 -type f -name 'Makefile' -exec grep -L 'release:' {} \; | xargs -n1 dirname | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
       # Output tags that match the targets
       - name: Output docker tags
         id: output-tags
@@ -37,7 +38,7 @@ jobs:
            const docker = JSON.parse(JSON.parse(DOCKER))
            const tags = JSON.parse(JSON.parse(TAGS))
            
-           const selectedTags = tags.filter(it => docker.includes(it.trim().split('/')[1]?.split('@')[0]))
+           const selectedTags = tags.filter(it => docker.includes(it.split('@')[0]))
            
            console.log(selectedTags)
            return JSON.stringify(JSON.stringify(selectedTags))

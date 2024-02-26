@@ -19,8 +19,8 @@ jobs:
       - name: Fetch tags
         run: git fetch --tags
       # Collect all directories in tools/ with a Makefile and a release target
-      - name: Collect go package names
-        run: echo "GO_PACKAGE=$(find tools/ -maxdepth 2 -type f -name 'Makefile' -exec grep -q 'release:' {} \; -print | xargs -n1 dirname | xargs -n1 basename | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+      - name: Collect go module names
+        run: echo "GO_MODULES=$(find tools/ -maxdepth 2 -type f -name 'Makefile' -exec grep -q 'release:' {} \; -print | xargs -n1 dirname | xargs -n1 basename | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
       # Set tags if they point to the current commit
       - name: Set tag
         run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
@@ -30,12 +30,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { GO_PACKAGE, TAGS } = process.env
-            console.log(GO_PACKAGE)
+            const { MODULES, TAGS } = process.env
+            console.log(MODULES)
             console.log(TAGS)
-            const goPackage = JSON.parse(JSON.parse(GO_PACKAGE))
+            
+            const modules = JSON.parse(JSON.parse(MODULES))
             const tags = JSON.parse(JSON.parse(TAGS))
-            const selectedTags = tags.filter(it => goPackage.includes(it.trim().split('/')[1]?.split('@')[0]))
+            
+            const selectedTags = tags.filter(it => modules.includes(it.split('@')[0]))
+
             console.log(selectedTags)
             return JSON.stringify(JSON.stringify(selectedTags))
           result-encoding: string
