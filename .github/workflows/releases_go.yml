@@ -64,10 +64,10 @@ jobs:
           ref: 'main'
       # Set working directory
       - name: Set working directory
-        run: echo "WORKING_DIR=tools/$(echo ${{ matrix.tag }} | awk -F'[/@]' '{print $3}' | sed 's/ *$//g')" >> $GITHUB_ENV
+        run: echo "WORKING_DIR=tools/$(echo ${{ matrix.tag }} | awk -F'[/@]' '{print $2}' | sed 's/ *$//g')" >> $GITHUB_ENV
       # Set version
       - name: Set version
-        run: echo "VERSION=$(echo ${{ matrix.tag }} | awk -F'[/@]' '{print $4}')" >> $GITHUB_ENV
+        run: echo "VERSION=$(echo ${{ matrix.tag }} | awk -F'[/@]' '{print $3}')" >> $GITHUB_ENV
       # Setup Golang from woring directory
       - name: 🐿 Setup Golang
         uses: actions/setup-go@v4
