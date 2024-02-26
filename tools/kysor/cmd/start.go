@@ -100,15 +100,15 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 		return nil, nil, err
 	}
 
-	expectedRuntime := pool.Runtime
-	split := strings.Split(expectedRuntime, "@kyvejs/")
+	protocolPrefix := "protocol/core@"
+
+	// TODO: after chain-upgrade 1.5.0, remove this and get the runtime from the pool
+	split := strings.Split(pool.Runtime, "@kyvejs/")
 	if len(split) != 2 {
-		return nil, nil, fmt.Errorf("invalid runtime name: %s", expectedRuntime)
+		return nil, nil, fmt.Errorf("invalid runtime name: %s", pool.Runtime)
 	}
 	expectedRuntimeDir := split[1]
-
-	// TODO: How should we name the runtime?
-	expectedRuntime = fmt.Sprintf("@kyvejs/integration/%s", expectedRuntimeDir)
+	runtimePrefix := fmt.Sprintf("runtime/%s@", expectedRuntimeDir)
 
 	pVersion, err := version.NewVersion(pool.Protocol.Version)
 	if err != nil {
@@ -124,27 +124,27 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 	var latestRuntimeVersion *kyveRef
 	var latestProtocolVersion *kyveRef
 	err = tagrefs.ForEach(func(ref *plumbing.Reference) error {
-		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), "@kyvejs/protocol@") {
+		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), protocolPrefix) {
 			if wantedProtocolVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("@kyvejs/protocol@%s", wantedProtocolVers.String()) && ref.Target().IsTag() {
+				if ref.Name().Short() == fmt.Sprintf("%s%s", protocolPrefix, wantedProtocolVers.String()) && ref.Target().IsTag() {
 					latestProtocolVersion = &kyveRef{
 						ver: wantedProtocolVers,
 						ref: ref,
 					}
 				}
 			} else {
-				latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, "@kyvejs/protocol@", protocolVersContraint)
+				latestProtocolVersion = getHigherVersion(latestProtocolVersion, ref, protocolPrefix, protocolVersContraint)
 			}
-		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), expectedRuntime) {
+		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), runtimePrefix) {
 			if wantedRuntimeVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("%s@%s", expectedRuntime, wantedRuntimeVers.String()) && ref.Target().IsTag() {
+				if ref.Name().Short() == fmt.Sprintf("%s%s", runtimePrefix, wantedRuntimeVers.String()) && ref.Target().IsTag() {
 					latestRuntimeVersion = &kyveRef{
 						ver: wantedRuntimeVers,
 						ref: ref,
 					}
 				}
 			} else {
-				latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s@", expectedRuntime), nil)
+				latestRuntimeVersion = getHigherVersion(latestRuntimeVersion, ref, fmt.Sprintf("%s", runtimePrefix), nil)
 			}
 		}
 		return nil
@@ -155,20 +155,20 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 
 	if latestProtocolVersion == nil {
 		if wantedProtocolVers != nil {
-			return nil, nil, fmt.Errorf("no protocol found for kyvejs/protocol@%s", wantedProtocolVers)
+			return nil, nil, fmt.Errorf("no protocol found for %s%s", protocolPrefix, wantedProtocolVers)
 		}
-		return nil, nil, fmt.Errorf("no protocol found for kyvejs/protocol@")
+		return nil, nil, fmt.Errorf("no protocol found for %s", protocolPrefix)
 	}
 	if latestRuntimeVersion == nil {
 		if wantedRuntimeVers != nil {
-			return nil, nil, fmt.Errorf("no runtime found for %s@%s", expectedRuntime, wantedRuntimeVers)
+			return nil, nil, fmt.Errorf("no runtime found for %s%s", runtimePrefix, wantedRuntimeVers)
 		}
-		return nil, nil, fmt.Errorf("no runtime found for %s", expectedRuntime)
+		return nil, nil, fmt.Errorf("no runtime found for %s", runtimePrefix)
 	}
 
 	latestProtocolVersion.path = filepath.Join(repoDir, protocolPath)
 	latestRuntimeVersion.path = filepath.Join(repoDir, runtimePath, expectedRuntimeDir)
-	latestProtocolVersion.name = "protocol"
+	latestProtocolVersion.name = "protocol-core"
 	latestRuntimeVersion.name = fmt.Sprintf("runtime-%s", expectedRuntimeDir)
 
 	return latestProtocolVersion, latestRuntimeVersion, nil
@@ -202,10 +202,10 @@ func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
 	return main, nil
 }
 
-// pullRepo clones or pulls the kyvejs repository
+// pullRepo clones or pulls the kyve-rdk repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
-	//TODO: change this branch
-	repoName := "github.com/shifty11/kyvejs"
+	//TODO: change this branch to github.com/KYVENetwork/kyve-rdk once it's ready
+	repoName := "github.com/shifty11/kyve-rdk-fork"
 	repoUrl := fmt.Sprintf("https://%s.git", repoName)
 
 	var repo *git.Repository
@@ -511,8 +511,8 @@ func start(
 		return "", err
 	}
 
-	// Clone or pull the kyvejs repository
-	repoDir := filepath.Join(homeDir, "kyvejs")
+	// Clone or pull the kyve-rdk repository
+	repoDir := filepath.Join(homeDir, "kyve-rdk")
 	repo, err := pullRepo(repoDir, false)
 	if err != nil {
 		return "", err

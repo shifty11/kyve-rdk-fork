@@ -33,8 +33,8 @@ GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 commit=$(shell git rev-parse HEAD)
 
 ldflags := $(LDFLAGS)
-ldflags += -X github.com/KYVENetwork/kyvejs/tools/kysor/cmd.Version=$(VERSION) \
-		  -X github.com/KYVENetwork/kyvejs/tools/kysor/cmd.Commit=$(commit)
+ldflags += -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Version=$(VERSION) \
+		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Commit=$(commit)
 ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
