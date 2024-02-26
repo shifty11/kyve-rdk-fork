@@ -76,7 +76,7 @@ test:
 
 test-e2e:
 	@echo "🧪 Running end-to-end tests..."
-	@../../e2etest/run-e2e-tests.sh "-test.run '/{{ .name }}\$$'"
+	@../../test/e2e/run-e2e-tests.sh "-test.run '/{{ .name }}\$$'"
 	@echo "✅ Completed end-to-end tests!"
 
 ###############################################################################
