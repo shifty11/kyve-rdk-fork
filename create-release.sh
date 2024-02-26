@@ -133,17 +133,6 @@ create_and_run_release_script() {
   rm release.sh
 }
 
-# Check if the project is types or sdk
-# If it is, then return 0, otherwise 1
-check_if_is_types_or_sdk() {
-  folder=$1
-  if [ "$folder" = "common/types" ] || [ "$folder" = "common/sdk" ]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 # Release all projects that have changes (except node projects)
 release() {
   local no_changes=true
@@ -157,22 +146,6 @@ release() {
     # Check if the project has any changes and if it does, then create a new tag
     if has_changes "$project" "$latest_tag"; then
       no_changes=false
-
-      # If the project is a node project, tell the user to run lerna version and exit
-      if check_if_is_types_or_sdk "$project"; then
-        echo "   Changes in $project detected."
-        echo "⚠️  Please run 'yarn lerna version' in the root folder and then run this script again"
-
-        # Ask the user if they want to continue
-        read -p "Do you want to continue? (y/N)" -r response
-        printf "\n"
-        if [[ $response =~ ^[Yy]$ ]]; then
-          continue
-        else
-          echo "Release aborted"
-          exit 1
-        fi
-      fi
 
       # Get current version
       current_version=$(get_current_version "$latest_tag")
