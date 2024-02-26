@@ -13,21 +13,43 @@ jobs:
       # Checkout the repository
       - name: Checkout the repository
         uses: actions/checkout@v4
-      # Collect all directories with a Dockerfile and get their full path (exclude templates)
+        with:
+          ref: 'main'
+      # Fetch tags
+      - name: Fetch tags
+        run: git fetch --tags
+      # Set tags if they point to the current commit
+      - name: Set tag
+        run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+      # Collect all directories (except integrations) with a Dockerfile and NO release target
       - name: Collect docker targets
-        id: collect
-        shell: bash
-        run: |
-          DOCKER=$(find . -type f -name 'Dockerfile' -exec dirname {} \; | grep -v 'kystrap/templates' | jq --raw-input . | jq --slurp . | jq tostring)
-          echo "::set-output name=DOCKER::$DOCKER"
+        run: echo "DOCKER=$(find protocol/ runtime/ tools/ -maxdepth 2 -type f -name 'Makefile' | xargs -n1 dirname | xargs -n1 basename | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+      # Output tags that match the targets
+      - name: Output docker tags
+        id: output-tags
+        uses: actions/github-script@v7
+        with:
+         script: |
+           const { DOCKER, TAGS } = process.env
+           console.log(DOCKER)
+           console.log(TAGS)
+           
+           const docker = JSON.parse(JSON.parse(DOCKER))
+           const tags = JSON.parse(JSON.parse(TAGS))
+           
+           const selectedTags = tags.filter(it => docker.includes(it.trim().split('/')[1]?.split('@')[0]))
+           
+           console.log(selectedTags)
+           return JSON.stringify(JSON.stringify(selectedTags))
+         result-encoding: string
       # Print var
       - name: Print var
         run: |
-          echo ${{ steps.collect.outputs.DOCKER }}
-      # Set var
-      - name: Set var
+          echo ${{ steps.output-tags.outputs.result }}
+      # Set tags
+      - name: Set tags
         id: set-env
-        run: echo "::set-output name=docker::${{steps.collect.outputs.DOCKER}}"
+        run: echo "::set-output name=docker::${{steps.output-tags.outputs.result}}"
 
   release:
     runs-on: ubuntu-latest
@@ -43,9 +65,6 @@ jobs:
       # Set working directory
       - name: Set working directory
         run: cd ${{ matrix.docker }}
-      # Build docker image
-      - name: Build docker image
-        run: docker build .
       # Tag docker image
       - name: Tag docker image
         uses: softprops/action-gh-release@v1
