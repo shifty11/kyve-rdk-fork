@@ -20,7 +20,7 @@ jobs:
         run: git fetch --tags
       # Collect all directories in tools/ with a Makefile and a release target
       - name: Collect go module names
-        run: echo "MODULES=$(find tools/ -maxdepth 2 -type f -name 'Makefile' -exec grep -q 'release:' {} \; -print | xargs -n1 dirname | xargs -n1 basename | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
+        run: echo "MODULES=$(find tools/ -maxdepth 2 -type f -name 'Makefile' -exec grep -q 'release:' {} \; -print | xargs -n1 dirname | jq --raw-input . | jq --slurp . | jq tostring)" >> $GITHUB_ENV
       # Set tags if they point to the current commit
       - name: Set tag
         run: echo "TAGS=$(git tag --points-at | jq  --raw-input .  | jq --slurp . | jq tostring)" >> $GITHUB_ENV
