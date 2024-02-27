@@ -298,11 +298,7 @@ func buildImages(
 	cli *client.Client,
 	pool *pooltypes.Pool,
 	label string,
-	protocolVersion *version.Version,
-	runtimeVersion *version.Version,
-	protocolBuildDir string,
-	runtimeBuildDir string,
-	verbose bool,
+	options AdvancedOptions,
 ) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
@@ -315,17 +311,16 @@ func buildImages(
 	var runtimeRef *plumbing.Reference
 
 	// TODO: split runtime and protocol into separate functions
-
-	protocol, runtime, err := getIntegrationVersions(kr.repo, pool, kr.dir, protocolVersion, runtimeVersion)
+	protocol, runtime, err := getIntegrationVersions(kr.repo, pool, kr.dir, options.ProtocolVersion, options.RuntimeVersion)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if protocolBuildDir != "" {
+	if options.ProtocolBuildDir != "" {
 		// If protocolBuildDir is set, use it as the build directory
 		vers := "(local)"
 		protocolImage = docker.Image{
-			Path:      protocolBuildDir,
+			Path:      options.ProtocolBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, "local")},
 			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
@@ -342,11 +337,11 @@ func buildImages(
 		}
 	}
 
-	if runtimeBuildDir != "" {
+	if options.RuntimeBuildDir != "" {
 		// If runtimeBuildDir is set, use it as the build directory
 		vers := "(local)"
 		runtimeImage = docker.Image{
-			Path:      runtimeBuildDir,
+			Path:      options.RuntimeBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, "local")},
 			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
@@ -363,12 +358,12 @@ func buildImages(
 		}
 	}
 
-	err = buildImage(w, protocolRef, cli, protocolImage, verbose)
+	err = buildImage(w, protocolRef, cli, protocolImage, options.Debug)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	err = buildImage(w, runtimeRef, cli, runtimeImage, verbose)
+	err = buildImage(w, runtimeRef, cli, runtimeImage, options.Debug)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -537,12 +532,7 @@ func start(
 	cli *client.Client,
 	valConfig config.ValaccountConfig,
 	runtimeEnv []string,
-	protocolVersion *version.Version,
-	runtimeVersion *version.Version,
-	protocolBuildDir string,
-	runtimeBuildDir string,
-	debug bool,
-	detached bool,
+	options AdvancedOptions,
 	errChan chan error,
 	newVersionChan chan interface{},
 ) (string, error) {
@@ -552,7 +542,7 @@ func start(
 	}
 	pool := response.GetPool().Data
 
-	if detached {
+	if options.Detached {
 		fmt.Println("    Starting KYSOR (detached)...")
 		fmt.Println("    Auto update during runtime is disabled in detached mode!")
 	} else {
@@ -574,7 +564,7 @@ func start(
 
 	// Build images
 	label := valConfig.GetContainerLabel()
-	protocol, runtime, err := buildImages(repo, cli, pool, label, protocolVersion, runtimeVersion, protocolBuildDir, runtimeBuildDir, debug)
+	protocol, runtime, err := buildImages(repo, cli, pool, label, options)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
 	}
@@ -586,12 +576,12 @@ func start(
 	}
 
 	// Start containers
-	protocolContainer, runtimeContainer, err := startContainers(cli, valConfig, pool, debug, protocol, runtime, label, runtimeEnv)
+	protocolContainer, runtimeContainer, err := startContainers(cli, valConfig, pool, options.Debug, protocol, runtime, label, runtimeEnv)
 	if err != nil {
 		return "", err
 	}
 
-	if detached {
+	if options.Detached {
 		fmt.Println()
 		fmt.Println("🔍  Use following commands to view the logs:")
 		fmt.Print("    ")
@@ -605,12 +595,12 @@ func start(
 		// Print runtime logs
 		go printLogs(ctx, cli, runtimeContainer, color.FgBlue, errChan)
 
-		// Check for new versions only if versions are not pinned
-		if protocolVersion == nil && runtimeVersion == nil {
-			fmt.Println("🔄  Auto update of docker container's is enabled")
-			go checkNewVersion(ctx, kyveClient, valConfig.Pool, repo, newVersionChan)
+		// If protocol and runtime are custom, there is no need to check for new versions
+		if options.HasCustomProtocol() && options.HasCustomRuntime() {
+			fmt.Println("🔄  Auto update of docker containers are disabled")
 		} else {
-			fmt.Println("🔄  Auto update of docker container's is disabled")
+			fmt.Println("🔄  Auto update of docker containers are enabled")
+			go checkNewVersion(ctx, kyveClient, valConfig.Pool, repo, newVersionChan)
 		}
 		fmt.Println()
 	}
@@ -663,7 +653,7 @@ func checkNewVersion(ctx context.Context, kyveClient *chain.KyveClient, poolId u
 	}
 }
 
-func validateVersion(s string) error {
+func validateVersionOrEmpty(s string) error {
 	if s == "" {
 		return nil
 	}
@@ -688,17 +678,31 @@ var (
 	}
 	flagStartProtocolVersion = commoncmd.StringFlag{
 		Name:       "protocol-version",
-		Usage:      "Specify the version of the protocol to run",
-		Prompt:     "Specify the version of the protocol to run (leave empty for latest)",
+		Usage:      "Specify the protocol version",
+		Prompt:     "Specify the protocol version (leave empty for latest)",
 		Required:   false,
-		ValidateFn: validateVersion,
+		ValidateFn: validateVersionOrEmpty,
+	}
+	flagStartProtocolBuildDir = commoncmd.StringFlag{
+		Name:       "protocol-build-dir",
+		Usage:      "Specify the directory to build the protocol image from",
+		Prompt:     "Specify the directory to build the protocol image from (leave empty to not build)",
+		Required:   false,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
 	}
 	flagStartRuntimeVersion = commoncmd.StringFlag{
 		Name:       "runtime-version",
-		Usage:      "Specify the version of the runtime to run",
-		Prompt:     "Specify the version of the runtime to run (leave empty for latest)",
+		Usage:      "Specify the runtime version",
+		Prompt:     "Specify the runtime version (leave empty for latest)",
 		Required:   false,
-		ValidateFn: validateVersion,
+		ValidateFn: validateVersionOrEmpty,
+	}
+	flagStartRuntimeBuildDir = commoncmd.StringFlag{
+		Name:       "runtime-build-dir",
+		Usage:      "Specify the directory to build the runtime image from",
+		Prompt:     "Specify the directory to build the runtime image from (leave empty to not build)",
+		Required:   false,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
 	}
 	flagStartDebug = commoncmd.BoolFlag{
 		Name:         "debug",
@@ -712,19 +716,129 @@ var (
 		Usage:        "Run the validator node in detached mode (no auto update)",
 		DefaultValue: false,
 	}
-	flagStartProtocolBuildDir = commoncmd.StringFlag{
-		Name:       "protocol-build-dir",
-		Usage:      "Specify the directory of the protocol to build the image from",
-		Required:   false,
-		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
-	}
-	flagStartRuntimeBuildDir = commoncmd.StringFlag{
-		Name:       "runtime-build-dir",
-		Usage:      "Specify the directory of the runtime to build the image from",
-		Required:   false,
-		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
-	}
 )
+
+type AdvancedOptions struct {
+	ProtocolVersion  *version.Version
+	ProtocolBuildDir string
+	RuntimeVersion   *version.Version
+	RuntimeBuildDir  string
+	Debug            bool
+	Detached         bool
+}
+
+func (o AdvancedOptions) HasCustomProtocol() bool {
+	return o.ProtocolVersion != nil || o.ProtocolBuildDir != ""
+}
+
+func (o AdvancedOptions) HasCustomRuntime() bool {
+	return o.RuntimeVersion != nil || o.RuntimeBuildDir != ""
+}
+
+func getAdvanceOptions(cmd *cobra.Command) (options AdvancedOptions, err error) {
+	// Prompt to show advanced options
+	showAdvanced := false
+	if commoncmd.IsInteractive(cmd) {
+		showAdvanced, err = commoncmd.PromptYesNo("Show advanced options?", commoncmd.No)
+		if err != nil {
+			return options, err
+		}
+	}
+
+	// Protocol version & build dir
+	var protocolVersionStr string
+	if showAdvanced {
+		protocolVersionStr, err = commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolVersion)
+		if err != nil {
+			return options, err
+		}
+	} else {
+		protocolVersionStr, err = commoncmd.GetStringFromFlag(cmd, flagStartProtocolVersion)
+		if err != nil {
+			return options, err
+		}
+	}
+	if protocolVersionStr != "" {
+		options.ProtocolVersion, err = version.NewVersion(protocolVersionStr)
+		if err != nil {
+			return options, err
+		}
+	} else {
+		// Protocol build dir (only ask if protocol version is not set)
+		if showAdvanced {
+			options.ProtocolBuildDir, err = commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolBuildDir)
+			if err != nil {
+				return options, err
+			}
+		} else {
+			options.ProtocolBuildDir, err = commoncmd.GetStringFromFlag(cmd, flagStartProtocolBuildDir)
+			if err != nil {
+				return options, err
+			}
+		}
+	}
+
+	// Runtime version & build dir
+	var runtimeVersionStr string
+	if showAdvanced {
+		runtimeVersionStr, err = commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeVersion)
+		if err != nil {
+			return options, err
+		}
+	} else {
+		runtimeVersionStr, err = commoncmd.GetStringFromFlag(cmd, flagStartRuntimeVersion)
+		if err != nil {
+			return options, err
+		}
+	}
+	if runtimeVersionStr != "" {
+		options.RuntimeVersion, err = version.NewVersion(runtimeVersionStr)
+		if err != nil {
+			return options, err
+		}
+	} else {
+		// Runtime build dir (only ask if runtime version is not set)
+		if showAdvanced {
+			options.RuntimeBuildDir, err = commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeBuildDir)
+			if err != nil {
+				return options, err
+			}
+		} else {
+			options.RuntimeBuildDir, err = commoncmd.GetStringFromFlag(cmd, flagStartRuntimeBuildDir)
+			if err != nil {
+				return options, err
+			}
+		}
+	}
+
+	if showAdvanced {
+		// Debug
+		options.Debug, err = commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
+		if err != nil {
+			return options, err
+		}
+
+		// Detached
+		options.Detached, err = commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDetached)
+		if err != nil {
+			return options, err
+		}
+	} else {
+		// Debug
+		options.Debug, err = cmd.Flags().GetBool(flagStartDebug.Name)
+		if err != nil {
+			return options, err
+		}
+
+		// Detached
+		options.Detached, err = cmd.Flags().GetBool(flagStartDetached.Name)
+		if err != nil {
+			return options, err
+		}
+	}
+
+	return options, nil
+}
 
 func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -757,52 +871,7 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
-			// Protocol version
-			var protocolVersion *version.Version
-			protocolVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolVersion)
-			if err != nil {
-				return err
-			}
-			if protocolVersionStr != "" {
-				protocolVersion, err = version.NewVersion(protocolVersionStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			// Runtime version
-			var runtimeVersion *version.Version
-			runtimeVersionStr, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeVersion)
-			if err != nil {
-				return err
-			}
-			if runtimeVersionStr != "" {
-				runtimeVersion, err = version.NewVersion(runtimeVersionStr)
-				if err != nil {
-					return err
-				}
-			}
-
-			// Debug
-			debug, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDebug)
-			if err != nil {
-				return err
-			}
-
-			// Detached
-			detached, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagStartDetached)
-			if err != nil {
-				return err
-			}
-
-			// Protocol build dir
-			protocolBuildDir, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolBuildDir)
-			if err != nil {
-				return err
-			}
-
-			// Runtime build dir
-			runtimeBuildDir, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeBuildDir)
+			options, err := getAdvanceOptions(cmd)
 			if err != nil {
 				return err
 			}
@@ -831,19 +900,14 @@ func startCmd() *cobra.Command {
 				cli,
 				valConfig,
 				runtimeEnv,
-				protocolVersion,
-				runtimeVersion,
-				protocolBuildDir,
-				runtimeBuildDir,
-				debug,
-				detached,
+				options,
 				errChan,
 				newVersionChan,
 			)
 			if err != nil {
 				return err
 			}
-			if !detached {
+			if !options.Detached {
 				sigc := make(chan os.Signal, 1)
 				signal.Notify(sigc,
 					syscall.SIGHUP,
@@ -884,12 +948,7 @@ func startCmd() *cobra.Command {
 							cli,
 							valConfig,
 							runtimeEnv,
-							protocolVersion,
-							runtimeVersion,
-							protocolBuildDir,
-							runtimeBuildDir,
-							debug,
-							detached,
+							options,
 							errChan,
 							newVersionChan,
 						)

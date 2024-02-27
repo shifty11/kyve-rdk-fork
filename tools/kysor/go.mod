@@ -4,7 +4,7 @@ go 1.21.6
 
 require (
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240226172902-0f04e0efb7a3
+	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240227173326-1be0e100ca56
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
