@@ -126,7 +126,7 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 	err = tagrefs.ForEach(func(ref *plumbing.Reference) error {
 		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), protocolPrefix) {
 			if wantedProtocolVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("%s%s", protocolPrefix, wantedProtocolVers.String()) && ref.Target().IsTag() {
+				if ref.Name().Short() == fmt.Sprintf("%s%s", protocolPrefix, wantedProtocolVers.String()) {
 					latestProtocolVersion = &kyveRef{
 						ver: wantedProtocolVers,
 						ref: ref,
@@ -137,7 +137,7 @@ func getIntegrationVersions(repo *git.Repository, pool *pooltypes.Pool, repoDir 
 			}
 		} else if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), runtimePrefix) {
 			if wantedRuntimeVers != nil {
-				if ref.Name().Short() == fmt.Sprintf("%s%s", runtimePrefix, wantedRuntimeVers.String()) && ref.Target().IsTag() {
+				if ref.Name().Short() == fmt.Sprintf("%s%s", runtimePrefix, wantedRuntimeVers.String()) {
 					latestRuntimeVersion = &kyveRef{
 						ver: wantedRuntimeVers,
 						ref: ref,
