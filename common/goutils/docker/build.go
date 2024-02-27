@@ -24,6 +24,8 @@ type Image struct {
 	Path   string
 	Tags   []string
 	Labels map[string]string
+	// BuildArgs needs to be a *string to differentiate between "" as value and no value
+	BuildArgs map[string]*string
 }
 
 func (i Image) TagsWithoutVersion() []string {
@@ -171,6 +173,7 @@ func BuildImage(ctx context.Context, dockerClient *client.Client, image Image, o
 		Tags:       image.Tags,
 		Remove:     true,
 		Labels:     image.Labels,
+		BuildArgs:  image.BuildArgs,
 	}
 	res, err := dockerClient.ImageBuild(ctx, tar, opts)
 	if err != nil {

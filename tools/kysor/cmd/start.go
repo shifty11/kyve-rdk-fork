@@ -264,13 +264,15 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 }
 
 func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Client, image docker.Image, verbose bool) error {
-	fmt.Printf("📦  Checkout %s\n", ref.Name().Short())
-	err := worktree.Checkout(&git.CheckoutOptions{
-		Branch: ref.Name(),
-		Force:  true,
-	})
-	if err != nil {
-		return err
+	if ref != nil {
+		fmt.Printf("📦  Checkout %s\n", ref.Name().Short())
+		err := worktree.Checkout(&git.CheckoutOptions{
+			Branch: ref.Name(),
+			Force:  true,
+		})
+		if err != nil {
+			return err
+		}
 	}
 
 	showOnlyProgress := true
@@ -282,44 +284,94 @@ func buildImage(worktree *git.Worktree, ref *plumbing.Reference, cli *client.Cli
 		}
 	}
 
-	fmt.Printf("🏗️   Building %s ...\n", image.Tags[0])
-	return docker.BuildImage(context.Background(), cli, image, docker.OutputOptions{ShowOnlyProgress: showOnlyProgress, PrintFn: printFn})
+	fmt.Printf("🐳  Building %s ...\n", image.Tags[0])
+	err := docker.BuildImage(context.Background(), cli, image, docker.OutputOptions{ShowOnlyProgress: showOnlyProgress, PrintFn: printFn})
+	if err == nil {
+		fmt.Printf("✅  Finished bulding image: %s\n", image.Tags[0])
+	}
+	return err
 }
 
 // buildImages builds the protocol and runtime images
-func buildImages(kr *kyveRepo, cli *client.Client, pool *pooltypes.Pool, label string, protocolVersion *version.Version, runtimeVersion *version.Version, verbose bool) (*docker.Image, *docker.Image, error) {
+func buildImages(
+	kr *kyveRepo,
+	cli *client.Client,
+	pool *pooltypes.Pool,
+	label string,
+	protocolVersion *version.Version,
+	runtimeVersion *version.Version,
+	protocolBuildDir string,
+	runtimeBuildDir string,
+	verbose bool,
+) (*docker.Image, *docker.Image, error) {
 	w, err := kr.repo.Worktree()
 	if err != nil {
 		return nil, nil, err
 	}
+
+	var protocolImage docker.Image
+	var protocolRef *plumbing.Reference
+	var runtimeImage docker.Image
+	var runtimeRef *plumbing.Reference
+
+	// TODO: split runtime and protocol into separate functions
 
 	protocol, runtime, err := getIntegrationVersions(kr.repo, pool, kr.dir, protocolVersion, runtimeVersion)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	protocolImage := docker.Image{
-		Path:   protocol.path,
-		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
-		Labels: map[string]string{globalCleanupLabel: "", label: ""},
-	}
-	runtimeImage := docker.Image{
-		Path:   runtime.path,
-		Tags:   []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, runtime.ver.String())},
-		Labels: map[string]string{globalCleanupLabel: "", label: ""},
+	if protocolBuildDir != "" {
+		// If protocolBuildDir is set, use it as the build directory
+		vers := "(local)"
+		protocolImage = docker.Image{
+			Path:      protocolBuildDir,
+			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, "local")},
+			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			BuildArgs: map[string]*string{"VERSION": &vers},
+		}
+	} else {
+		// Otherwise, use the version from the repository
+		protocolRef = protocol.ref
+		vers := protocol.ver.String()
+		protocolImage = docker.Image{
+			Path:      protocol.path,
+			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
+			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			BuildArgs: map[string]*string{"VERSION": &vers},
+		}
 	}
 
-	err = buildImage(w, protocol.ref, cli, protocolImage, verbose)
+	if runtimeBuildDir != "" {
+		// If runtimeBuildDir is set, use it as the build directory
+		vers := "(local)"
+		runtimeImage = docker.Image{
+			Path:      runtimeBuildDir,
+			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, "local")},
+			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			BuildArgs: map[string]*string{"VERSION": &vers},
+		}
+	} else {
+		// Otherwise, use the version from the repository
+		runtimeRef = runtime.ref
+		vers := runtime.ver.String()
+		runtimeImage = docker.Image{
+			Path:      runtime.path,
+			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, runtime.ver.String())},
+			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			BuildArgs: map[string]*string{"VERSION": &vers},
+		}
+	}
+
+	err = buildImage(w, protocolRef, cli, protocolImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("🏗️   Finished bulding image: " + protocolImage.Tags[0])
 
-	err = buildImage(w, runtime.ref, cli, runtimeImage, verbose)
+	err = buildImage(w, runtimeRef, cli, runtimeImage, verbose)
 	if err != nil {
 		return nil, nil, err
 	}
-	fmt.Println("🏗️   Finished bulding image " + runtimeImage.Tags[0])
 	return &protocolImage, &runtimeImage, nil
 }
 
@@ -487,6 +539,8 @@ func start(
 	runtimeEnv []string,
 	protocolVersion *version.Version,
 	runtimeVersion *version.Version,
+	protocolBuildDir string,
+	runtimeBuildDir string,
 	debug bool,
 	detached bool,
 	errChan chan error,
@@ -520,7 +574,7 @@ func start(
 
 	// Build images
 	label := valConfig.GetContainerLabel()
-	protocol, runtime, err := buildImages(repo, cli, pool, label, protocolVersion, runtimeVersion, debug)
+	protocol, runtime, err := buildImages(repo, cli, pool, label, protocolVersion, runtimeVersion, protocolBuildDir, runtimeBuildDir, debug)
 	if err != nil {
 		return "", fmt.Errorf("failed to build images: %v", err)
 	}
@@ -658,6 +712,18 @@ var (
 		Usage:        "Run the validator node in detached mode (no auto update)",
 		DefaultValue: false,
 	}
+	flagStartProtocolBuildDir = commoncmd.StringFlag{
+		Name:       "protocol-build-dir",
+		Usage:      "Specify the directory of the protocol to build the image from",
+		Required:   false,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
+	}
+	flagStartRuntimeBuildDir = commoncmd.StringFlag{
+		Name:       "runtime-build-dir",
+		Usage:      "Specify the directory of the runtime to build the image from",
+		Required:   false,
+		ValidateFn: commoncmd.ValidatePathExistsOrEmpty,
+	}
 )
 
 func startCmd() *cobra.Command {
@@ -729,6 +795,18 @@ func startCmd() *cobra.Command {
 				return err
 			}
 
+			// Protocol build dir
+			protocolBuildDir, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartProtocolBuildDir)
+			if err != nil {
+				return err
+			}
+
+			// Runtime build dir
+			runtimeBuildDir, err := commoncmd.GetStringFromPromptOrFlag(cmd, flagStartRuntimeBuildDir)
+			if err != nil {
+				return err
+			}
+
 			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {
 				return fmt.Errorf("failed to create docker client: %v", err)
@@ -755,6 +833,8 @@ func startCmd() *cobra.Command {
 				runtimeEnv,
 				protocolVersion,
 				runtimeVersion,
+				protocolBuildDir,
+				runtimeBuildDir,
 				debug,
 				detached,
 				errChan,
@@ -806,6 +886,8 @@ func startCmd() *cobra.Command {
 							runtimeEnv,
 							protocolVersion,
 							runtimeVersion,
+							protocolBuildDir,
+							runtimeBuildDir,
 							debug,
 							detached,
 							errChan,
@@ -826,8 +908,19 @@ func startCmd() *cobra.Command {
 		},
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[config.ValaccountConfig]{flagStartValaccount})
-	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagStartEnvFile, flagStartProtocolVersion, flagStartRuntimeVersion})
+	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{
+		flagStartEnvFile,
+		flagStartProtocolVersion,
+		flagStartRuntimeVersion,
+		flagStartProtocolBuildDir,
+		flagStartRuntimeBuildDir,
+	})
 	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagStartDebug, flagStartDetached})
+
+	// Only protocol-version or protocol-build-dir can be set
+	cmd.MarkFlagsMutuallyExclusive(flagStartProtocolVersion.Name, flagStartProtocolBuildDir.Name)
+	// Only runtime-version or runtime-build-dir can be set
+	cmd.MarkFlagsMutuallyExclusive(flagStartRuntimeVersion.Name, flagStartRuntimeBuildDir.Name)
 	return cmd
 }
 
