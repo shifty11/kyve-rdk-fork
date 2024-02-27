@@ -30,12 +30,21 @@ endif
 ARCH ?= $(BUILDARCH)
 
 ###############################################################################
+
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 DOCKERFILE ?= Dockerfile
 VERSION ?= latest
 DOCKER_IMAGE_NAME={{ .name }}
 BINARY_NAME ?= {{ .name | ToLower }}-$(GOOS)-$(ARCH)
 CGO_ENABLED=0
+
+###############################################################################
+
+ldflags := $(LDFLAGS)
+ldflags += -X github.com/KYVENetwork/kyve-rdk/runtime/{{ .name | ToLower }}/server.version=$(VERSION)
+ldflags := $(strip $(ldflags))
+
+BUILD_FLAGS := -ldflags '$(ldflags)'
 
 .PHONY: ensure_version build format lint test test-e2e docker-image docker-run
 
@@ -85,7 +94,7 @@ test-e2e:
 
 build: ensure_version
 	@echo "🐳 Building docker image..."
-	go build -o build/$(BINARY_NAME) .
+	go build -o build/$(BINARY_NAME) $(BUILD_FLAGS) .
 	@echo "✅ Completed binary build!"
 
 ###############################################################################

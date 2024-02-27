@@ -11,6 +11,11 @@ import (
 	"strconv"
 )
 
+const (
+	name = "runtime/{{ .name | ToLower }}"
+	version = "(none)" // will be set by build command
+)
+
 type {{ .name | ToPascal }}Server struct {
 	pb.RuntimeServiceServer
 }
@@ -36,12 +41,12 @@ type {{ .name | ToPascal }}TransformedItemValue struct {
 
 // GetRuntimeName returns the name of the runtime. Example "runtime/tendermint"
 func (t *{{ .name | ToPascal }}Server) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
-	return &pb.GetRuntimeNameResponse{Name: "runtime/{{ .name | ToLower }}"}, nil
+	return &pb.GetRuntimeNameResponse{Name: name}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
 func (t *{{ .name | ToPascal }}Server) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
-	return &pb.GetRuntimeVersionResponse{Version: "{{ .version }}"}, nil
+	return &pb.GetRuntimeVersionResponse{Version: version}, nil
 }
 
 // ValidateSetConfig parses the raw runtime config found on pool, validates it and finally sets
