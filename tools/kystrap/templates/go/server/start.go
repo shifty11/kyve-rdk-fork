@@ -11,6 +11,7 @@ import (
 const (
 	host = "0.0.0.0"
 	port = "50051"
+	maxMessageSize = 2 * 1024 * 1024 * 1024 	// 2 GB
 )
 
 func StartServer() {
@@ -21,7 +22,7 @@ func StartServer() {
 	}
 
 	// Create a new gRPC server instance
-	server := grpc.NewServer()
+	server := grpc.NewServer(grpc.MaxRecvMsgSize(maxMessageSize), grpc.MaxSendMsgSize(maxMessageSize))
 
 	// Register the Tendermint service with the gRPC server
 	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToPascal }}Server{})
