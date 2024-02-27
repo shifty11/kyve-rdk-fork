@@ -28,24 +28,26 @@ ARCH ?= $(BUILDARCH)
 
 ###############################################################################
 
-GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
-
-commit=$(shell git rev-parse HEAD)
-
-ldflags := $(LDFLAGS)
-ldflags += -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Version=$(VERSION) \
-		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Commit=$(commit)
-ldflags := $(strip $(ldflags))
-
-BUILD_FLAGS := -ldflags '$(ldflags)'
-
-###############################################################################
-
 PLATFORMS=linux darwin
-VERSION ?= latest
+VERSION ?= (dev)
 DOCKER_IMAGE_NAME ?= kysor
 BINARY_NAME ?= kysor
 CGO_ENABLED=0
+
+###############################################################################
+
+GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
+
+commit=$(shell git rev-parse HEAD)
+tag=$(shell git describe --tags --exact-match 2>/dev/null)
+
+ldflags := $(LDFLAGS)
+ldflags += -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Version=$(VERSION) \
+		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Commit=$(commit) \
+		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Tag=$(tag)
+ldflags := $(strip $(ldflags))
+
+BUILD_FLAGS := -ldflags '$(ldflags)'
 
 ###############################################################################
 ###                                 Checks                                  ###
@@ -79,12 +81,12 @@ lint:
 
 build: ensure_version
 	@echo "🏗️  Building binary..."
-	go build -o build/$(BINARY_NAME) .
+	go build -o build/$(BINARY_NAME) $(BUILD_FLAGS) .
 	@echo "✅ Completed binary build!"
 
 install: ensure_version
 	@echo "🏗️  Installing binary..."
-	go install .
+	go install $(BUILD_FLAGS) .
 	@echo "✅ Completed binary install!"
 
 release: ensure_version

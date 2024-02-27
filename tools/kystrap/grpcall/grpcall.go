@@ -102,7 +102,14 @@ func (gc *GrpcCaller) dial() (*grpc.ClientConn, error) {
 	var creds credentials.TransportCredentials
 
 	grpcurlUA := "kystrap"
-	opts = append(opts, grpc.WithUserAgent(grpcurlUA))
+	maxMessageSize := 2 * 1024 * 1024 * 1024 // 2 GB
+	opts = append(
+		opts,
+		grpc.WithUserAgent(grpcurlUA),
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallRecvMsgSize(maxMessageSize),
+			grpc.MaxCallSendMsgSize(maxMessageSize)),
+	)
 
 	network := "tcp"
 
