@@ -28,7 +28,7 @@ func StartServer() {
 	pb.RegisterRuntimeServiceServer(server, &{{ .name | ToPascal }}Server{})
 
 	// Start serving incoming connections
-	fmt.Printf(fmt.Sprintf("🌐 {{ .name | ToPascal }}Server is running on on http://%s:%s...\nPress Ctrl + C to exit.\n", host, port))
+	fmt.Printf("🌐 {{ .name | ToPascal }}Server is running on on http://%s:%s...\nPress Ctrl + C to exit.\n", host, port)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Fatalf("Failed to serve gRPC server: %v", err)
