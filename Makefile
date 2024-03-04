@@ -12,8 +12,8 @@ ensure_all: ensure_go_version ensure_yarn
 
 # Check if specified go version is installed
 ensure_go_version:
-ifneq ($(GO_VERSION),1.21)
-	$(error ❌  Please run Go v1.21.x..)
+ifneq ($(GO_VERSION),1.22)
+	$(error ❌  Please run Go v1.22.x..)
 endif
 
 # Check if yarn is installed

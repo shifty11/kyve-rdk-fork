@@ -6,7 +6,7 @@ FROM bufbuild/buf:latest as BUF_BUILDER
 ###################################################################################
 # Go image that contains go plugins for protoc
 ###################################################################################
-FROM golang:1.21.4-alpine as GO_BUILDER
+FROM golang:1.22.0-alpine as GO_BUILDER
 
 # Install protoc-gen-go for plugin `go` in buf.gen.yaml
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.31.0

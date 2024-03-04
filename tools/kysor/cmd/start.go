@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/docker/go-connections/nat"
 	"io"
 	"os"
 	"os/signal"
@@ -15,6 +14,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/docker/go-connections/nat"
 
 	"github.com/fatih/color"
 

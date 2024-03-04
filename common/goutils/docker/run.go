@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"fmt"
+
 	"github.com/docker/go-connections/nat"
 
 	"github.com/docker/docker/api/types"

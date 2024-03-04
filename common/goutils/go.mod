@@ -1,11 +1,12 @@
 module github.com/KYVENetwork/kyve-rdk/common/goutils
 
-go 1.21.6
+go 1.22.0
 
 require (
 	github.com/chzyer/readline v1.5.1
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/docker/docker v25.0.2+incompatible
+	github.com/docker/go-connections v0.5.0
 	github.com/golangci/golangci-lint v1.55.1
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
@@ -74,7 +75,6 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
-	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect

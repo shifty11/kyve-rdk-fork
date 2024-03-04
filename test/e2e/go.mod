@@ -1,6 +1,6 @@
 module github.com/KYVENetwork/kyve-rdk/e2etest
 
-go 1.21.6
+go 1.22.0
 
 require (
 	cosmossdk.io/math v1.2.0
