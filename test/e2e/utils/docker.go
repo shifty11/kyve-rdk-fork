@@ -132,9 +132,10 @@ func (pc *IntegrationBuilder) BuildRuntimes(testConfigs []*TestConfig) error {
 			return err
 		}
 		runtimeConfigs = append(runtimeConfigs, docker.Image{
-			Path:   cfg.Runtime.Path,
-			Tags:   []string{runtimeImage(cfg.Runtime)},
-			Labels: map[string]string{cleanupLabel: ""},
+			Path:      cfg.Runtime.Path,
+			Tags:      []string{runtimeImage(cfg.Runtime)},
+			Labels:    map[string]string{cleanupLabel: ""},
+			BuildArgs: map[string]*string{"VERSION": &defaultVersion},
 		})
 	}
 
