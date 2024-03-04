@@ -48,6 +48,7 @@ CMD /bin/bash -c "set -a; source .env &>0; set +a; \
     --request-backoff \$REQUEST_BACKOFF \
     --cache \$CACHE \
     --metrics \$METRICS \
+    --metrics-port \$METRICS_PORT \
     --valaccount VALACCOUNT \
     --chain-id \$CHAIN_ID \
     --rpc \$RPC \

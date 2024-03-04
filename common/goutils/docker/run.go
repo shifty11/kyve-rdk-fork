@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"fmt"
+	"github.com/docker/go-connections/nat"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -17,15 +18,16 @@ type NetworkConfig struct {
 }
 
 type ContainerConfig struct {
-	Image      string
-	Name       string
-	Network    string
-	User       string
-	Env        []string
-	Binds      []string
-	Cmd        []string
-	Labels     map[string]string
-	ExtraHosts []string
+	Image        string
+	Name         string
+	Network      string
+	User         string
+	Env          []string
+	Binds        []string
+	Cmd          []string
+	Labels       map[string]string
+	ExtraHosts   []string
+	ExposedPorts nat.PortSet
 }
 
 func CreateNetwork(ctx context.Context, cli *client.Client, network NetworkConfig) error {
@@ -56,18 +58,29 @@ func StartContainer(ctx context.Context, cli *client.Client, config ContainerCon
 		}
 	}
 
+	// Create port bindings for exposed ports
+	var portBindings nat.PortMap = make(map[nat.Port][]nat.PortBinding)
+	for port := range config.ExposedPorts {
+		portBindings[port] = []nat.PortBinding{{
+			HostIP:   "0.0.0.0",
+			HostPort: port.Port(),
+		}}
+	}
+
 	r, err := cli.ContainerCreate(
 		ctx,
 		&container.Config{
-			Image:  config.Image,
-			Env:    config.Env,
-			Cmd:    config.Cmd,
-			User:   config.User,
-			Labels: config.Labels,
+			Image:        config.Image,
+			Env:          config.Env,
+			Cmd:          config.Cmd,
+			User:         config.User,
+			Labels:       config.Labels,
+			ExposedPorts: config.ExposedPorts,
 		},
 		&container.HostConfig{
-			Binds:      config.Binds,
-			ExtraHosts: config.ExtraHosts,
+			Binds:        config.Binds,
+			ExtraHosts:   config.ExtraHosts,
+			PortBindings: portBindings,
 		},
 		&network.NetworkingConfig{
 			EndpointsConfig: endpointsConfig,

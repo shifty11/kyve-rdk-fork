@@ -216,7 +216,7 @@ func valaccountsCreateCmd() *cobra.Command {
 				RequestBackoff: fmt.Sprintf("%d", backoffTime),
 				Cache:          cache.Value(),
 				Metrics:        metrics,
-				MetricsPort:    fmt.Sprintf("%d", metricsPort),
+				MetricsPort:    uint64(metricsPort),
 			}
 
 			err = valaccountConfig.Save(configPath)

@@ -5,11 +5,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/docker/go-connections/nat"
 	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
 	goruntime "runtime"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -391,6 +393,8 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		PoolId:      pool.Id,
 		Debug:       debug,
 		ChainId:     config.GetConfigX().ChainID,
+		Metrics:     valConfig.Metrics,
+		MetricsPort: valConfig.MetricsPort,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -404,12 +408,22 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		return nil, nil, err
 	}
 
+	var exposedPorts nat.PortSet
+	if valConfig.Metrics {
+		port, err := nat.NewPort("tcp", strconv.FormatUint(valConfig.MetricsPort, 10))
+		if err != nil {
+			return nil, nil, err
+		}
+		exposedPorts = nat.PortSet{port: {}}
+	}
+
 	pConfig := docker.ContainerConfig{
-		Image:   protocol.Tags[0],
-		Name:    protocolName,
-		Network: label,
-		Env:     env,
-		Labels:  map[string]string{globalCleanupLabel: "", label: ""},
+		Image:        protocol.Tags[0],
+		Name:         protocolName,
+		Network:      label,
+		Env:          env,
+		Labels:       map[string]string{globalCleanupLabel: "", label: ""},
+		ExposedPorts: exposedPorts,
 	}
 
 	rConfig := docker.ContainerConfig{

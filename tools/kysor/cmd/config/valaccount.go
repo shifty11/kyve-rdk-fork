@@ -30,7 +30,7 @@ type ValaccountConfig struct {
 	RequestBackoff string `koanf:"requestBackoff"`
 	Cache          string `koanf:"cache"`
 	Metrics        bool   `koanf:"metrics"`
-	MetricsPort    string `koanf:"metricsPort"`
+	MetricsPort    uint64 `koanf:"metricsPort"`
 }
 
 func (c ValaccountConfig) Save(path string) error {
