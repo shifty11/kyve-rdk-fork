@@ -102,7 +102,6 @@ type OutputOptions struct {
 func printProgress(bar *progressbar.ProgressBar, line *buildLine) *progressbar.ProgressBar {
 	hasProgress, step, total := line.Progress()
 	if hasProgress {
-		// fmt.Printf("hasProgress: %v, step: %d, total: %d\n", hasProgress, step, total)
 		if bar == nil {
 			bar = progressbar.NewOptions(
 				total,
@@ -116,7 +115,6 @@ func printProgress(bar *progressbar.ProgressBar, line *buildLine) *progressbar.P
 				progressbar.OptionSetRenderBlankState(true),
 			)
 		}
-		// fmt.Printf("Setting bar to %d\n", step)
 		err := bar.Set(step)
 		if err != nil {
 			fmt.Println(err)
@@ -183,12 +181,7 @@ func BuildImage(ctx context.Context, dockerClient *client.Client, image Image, o
 	//goland:noinspection GoUnhandledErrorResult
 	defer res.Body.Close()
 
-	err = printBuild(res.Body, outputOptions)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return printBuild(res.Body, outputOptions)
 }
 
 func BuildImageAsync(ctx context.Context, dockerClient *client.Client, image Image, errCh chan<- error, outputOptions OutputOptions) {
