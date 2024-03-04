@@ -32,7 +32,7 @@ ARCH ?= $(BUILDARCH)
 ###############################################################################
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 DOCKERFILE ?= Dockerfile
-VERSION ?= latest
+VERSION ?= notset
 DOCKER_IMAGE_NAME=kysor
 BINARY_NAME ?= kysor-$(GOOS)-$(ARCH)
 CGO_ENABLED=0

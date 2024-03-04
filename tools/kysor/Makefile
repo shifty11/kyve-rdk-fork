@@ -29,7 +29,7 @@ ARCH ?= $(BUILDARCH)
 ###############################################################################
 
 PLATFORMS=linux darwin
-VERSION ?= (dev)
+VERSION ?= notset
 DOCKER_IMAGE_NAME ?= kysor
 BINARY_NAME ?= kysor
 CGO_ENABLED=0
