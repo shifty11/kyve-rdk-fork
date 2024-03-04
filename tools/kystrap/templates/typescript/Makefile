@@ -40,7 +40,7 @@ endif
 
 ###############################################################################
 DOCKERFILE ?= Dockerfile
-VERSION ?= local
+VERSION ?= notset
 DOCKER_IMAGE_NAME={{ .name }}
 BINARY_NAME ?= kyve-$(NODE_ARCH)
 

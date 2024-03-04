@@ -33,7 +33,7 @@ ARCH ?= $(BUILDARCH)
 
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 DOCKERFILE ?= Dockerfile
-VERSION ?= latest
+VERSION ?= notset
 DOCKER_IMAGE_NAME={{ .name }}
 BINARY_NAME ?= {{ .name | ToLower }}-$(GOOS)-$(ARCH)
 CGO_ENABLED=0
@@ -53,8 +53,8 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 ###############################################################################
 
 ensure_version:
-ifneq ($(GO_VERSION),{{ .lang.go.version.minor }})
-	$(error ❌  Please run Go v{{ .lang.go.version.minor }}.x..)
+ifneq ($(GO_VERSION),{{ .lang.go.version.major }}.{{ .lang.go.version.minor }})
+	$(error ❌  Please run Go v{{ .lang.go.version.major }}.{{ .lang.go.version.minor }}.x..)
 endif
 
 ###############################################################################
@@ -103,7 +103,7 @@ build: ensure_version
 
 docker-image:
 	@echo "🏗️  Building docker image..."
-	DOCKER_BUILDKIT=1 docker build --platform linux/$(ARCH) -t $(DOCKER_IMAGE_NAME):$(VERSION) .
+	DOCKER_BUILDKIT=1 docker build --platform linux/$(ARCH) -t $(DOCKER_IMAGE_NAME):$(VERSION) --build-arg VERSION=$(VERSION) .
 	@echo "✅ Completed docker image build!"
 
 docker-run:

@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	pb "github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
+	pb "github.com/KYVENetwork/kyve-rdk/runtime/{{ .name }}/proto/kyverdk/runtime/v1"
 	"google.golang.org/grpc"
 	"log"
 	"net"

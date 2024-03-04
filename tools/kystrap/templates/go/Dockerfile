@@ -1,5 +1,7 @@
 # Build stage
-FROM golang:{{ .lang.go.version.patch }} AS build
+FROM golang:{{ .lang.go.version.full }} AS build
+
+ARG VERSION
 
 # Set work directory
 WORKDIR /app
@@ -15,7 +17,7 @@ COPY proto ./proto
 COPY server ./server
 
 # Build the Go app
-RUN BINARY_NAME=kyve-runtime make build
+RUN VERSION=$VERSION BINARY_NAME=kyve-runtime make build
 
 # Final stage to run the binary
 FROM ubuntu:latest

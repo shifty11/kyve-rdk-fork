@@ -4,17 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
-	pb "github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}/proto/kyverdk/runtime/v1"
+	pb "github.com/KYVENetwork/kyve-rdk/runtime/{{ .name }}/proto/kyverdk/runtime/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"reflect"
 	"strconv"
 )
 
-const (
-	name = "runtime/{{ .name | ToLower }}"
-	version = "(none)" // will be set by build command
-)
+const name = "runtime/{{ .name | ToLower }}"
+var version = "(none)" // will be set by build command
 
 type {{ .name | ToPascal }}Server struct {
 	pb.RuntimeServiceServer
