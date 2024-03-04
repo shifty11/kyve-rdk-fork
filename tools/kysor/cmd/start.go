@@ -243,7 +243,7 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 		// If we don't do this, the pull will fail if there are local changes
 		err = w.Reset(&git.ResetOptions{Commit: main.Hash(), Mode: git.HardReset})
 		if err != nil {
-			return nil, fmt.Errorf("failed to reset worktree: %v", err)
+			return nil, fmt.Errorf("failed to reset worktree: %v\nTry to delete the repo folder '%s'", err, repoDir)
 		}
 
 		// Pull the latest changes
@@ -252,7 +252,7 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 		}
 		err = w.Pull(&git.PullOptions{ReferenceName: main.Name(), Force: true})
 		if err != nil && !errors.Is(err, git.NoErrAlreadyUpToDate) && !errors.Is(err, git.ErrNonFastForwardUpdate) {
-			return nil, fmt.Errorf("failed to pull latest changes: %v", err)
+			return nil, fmt.Errorf("failed to pull latest changes: %v\nTry to delete the repo folder '%s'", err, repoDir)
 		}
 	}
 

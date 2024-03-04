@@ -40,7 +40,7 @@ endif
 
 ###############################################################################
 DOCKERFILE ?= Dockerfile
-VERSION ?= latest
+VERSION ?= local
 DOCKER_IMAGE_NAME=tendermint-ssync
 
 ###############################################################################
@@ -58,5 +58,5 @@ format:
 
 docker-image:
 	@echo "🐳 Building Docker image..."
-	@docker build -t $(DOCKER_IMAGE_NAME):$(VERSION) -f $(DOCKERFILE) .
+	@docker build -t $(DOCKER_IMAGE_NAME):$(VERSION) -f $(DOCKERFILE) --build-arg VERSION=$(VERSION) .
 	@echo "✅ Completed Docker image build!"
