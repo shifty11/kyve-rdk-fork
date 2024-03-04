@@ -318,7 +318,7 @@ func buildImages(
 
 	if options.ProtocolBuildDir != "" {
 		// If protocolBuildDir is set, use it as the build directory
-		vers := "(local)"
+		vers := "0.0.0-local"
 		protocolImage = docker.Image{
 			Path:      options.ProtocolBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, "local")},
@@ -339,7 +339,7 @@ func buildImages(
 
 	if options.RuntimeBuildDir != "" {
 		// If runtimeBuildDir is set, use it as the build directory
-		vers := "(local)"
+		vers := "0.0.0-local"
 		runtimeImage = docker.Image{
 			Path:      options.RuntimeBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, "local")},
