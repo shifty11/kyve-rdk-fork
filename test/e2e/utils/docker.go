@@ -38,7 +38,7 @@ const (
 	kystrapMount = "/app/out"
 )
 
-var defaultVersion = "latest"
+var defaultVersion = "1.0.0-test"
 var (
 	protocolImage = docker.Image{
 		Path:      rootPath + "protocol/core",
