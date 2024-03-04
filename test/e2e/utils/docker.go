@@ -38,10 +38,26 @@ const (
 	kystrapMount = "/app/out"
 )
 
+var defaultVersion = "latest"
 var (
-	protocolImage = docker.Image{Path: rootPath + "protocol/core", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
-	testapiImage  = docker.Image{Path: "testapi", Tags: []string{"testapi"}, Labels: map[string]string{cleanupLabel: ""}}
-	kystrapImage  = docker.Image{Path: rootPath + "tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
+	protocolImage = docker.Image{
+		Path:      rootPath + "protocol/core",
+		Tags:      []string{"protocol"},
+		Labels:    map[string]string{cleanupLabel: ""},
+		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+	}
+	testapiImage = docker.Image{
+		Path:      "testapi",
+		Tags:      []string{"testapi"},
+		Labels:    map[string]string{cleanupLabel: ""},
+		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+	}
+	kystrapImage = docker.Image{
+		Path:      rootPath + "tools/kystrap",
+		Tags:      []string{"kystrap-e2etest"},
+		Labels:    map[string]string{cleanupLabel: ""},
+		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+	}
 )
 
 type IntegrationBuilder struct {
