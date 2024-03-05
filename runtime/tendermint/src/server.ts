@@ -1,5 +1,9 @@
 import * as grpc from '@grpc/grpc-js';
-import { sendUnaryData, ServerUnaryCall, UntypedHandleCall } from '@grpc/grpc-js';
+import {
+  sendUnaryData,
+  ServerUnaryCall,
+  UntypedHandleCall,
+} from '@grpc/grpc-js';
 import Ajv from 'ajv';
 import block_schema from './schemas/block.json';
 import block_results_schema from './schemas/block_result.json';
@@ -23,7 +27,7 @@ import {
   ValidateDataItemRequest,
   ValidateDataItemResponse,
   ValidateSetConfigRequest,
-  ValidateSetConfigResponse
+  ValidateSetConfigResponse,
 } from './proto/kyverdk/runtime/v1/runtime';
 import axios from 'axios';
 import { VoteType } from './proto/kyve/bundles/v1beta1/tx';
@@ -33,29 +37,38 @@ const ajv = new Ajv();
 export class TendermintServer implements RuntimeServiceServer {
   [name: string]: UntypedHandleCall;
 
-  getRuntimeName(call: ServerUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>, callback: sendUnaryData<GetRuntimeNameResponse>): void {
+  getRuntimeName(
+    call: ServerUnaryCall<GetRuntimeNameRequest, GetRuntimeNameResponse>,
+    callback: sendUnaryData<GetRuntimeNameResponse>
+  ): void {
     callback(null, GetRuntimeNameResponse.create({ name }));
   }
 
-  getRuntimeVersion(call: ServerUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>, callback: sendUnaryData<GetRuntimeVersionResponse>): void {
+  getRuntimeVersion(
+    call: ServerUnaryCall<GetRuntimeVersionRequest, GetRuntimeVersionResponse>,
+    callback: sendUnaryData<GetRuntimeVersionResponse>
+  ): void {
     callback(null, GetRuntimeVersionResponse.create({ version }));
   }
 
-  validateSetConfig(call: ServerUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>, callback: sendUnaryData<ValidateSetConfigResponse>): void {
+  validateSetConfig(
+    call: ServerUnaryCall<ValidateSetConfigRequest, ValidateSetConfigResponse>,
+    callback: sendUnaryData<ValidateSetConfigResponse>
+  ): void {
     try {
       const config = JSON.parse(call.request.raw_config);
 
       if (!config.network) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: 'Config does not have property "network" defined'
+          details: 'Config does not have property "network" defined',
         });
         return;
       }
       if (!config.rpc) {
         callback({
           code: grpc.status.INVALID_ARGUMENT,
-          details: 'Config does not have property "rpc" defined'
+          details: 'Config does not have property "rpc" defined',
         });
         return;
       }
@@ -69,12 +82,15 @@ export class TendermintServer implements RuntimeServiceServer {
     } catch (error: any) {
       callback({
         code: grpc.status.INVALID_ARGUMENT,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  async getDataItem(call: ServerUnaryCall<GetDataItemRequest, GetDataItemResponse>, callback: sendUnaryData<GetDataItemResponse>): Promise<void> {
+  async getDataItem(
+    call: ServerUnaryCall<GetDataItemRequest, GetDataItemResponse>,
+    callback: sendUnaryData<GetDataItemResponse>
+  ): Promise<void> {
     try {
       const config = JSON.parse(call.request.config!.serialized_config);
       const key = call.request.key;
@@ -96,83 +112,95 @@ export class TendermintServer implements RuntimeServiceServer {
       // Construct the Value message
       const value = {
         block: block,
-        block_results: blockResults
+        block_results: blockResults,
       };
 
       // Construct the DataItem message
       const data_item = {
         key: key,
-        value: JSON.stringify(value)
+        value: JSON.stringify(value),
       };
 
       callback(null, GetDataItemResponse.create({ data_item }));
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  prevalidateDataItem(call: ServerUnaryCall<PrevalidateDataItemRequest, PrevalidateDataItemResponse>, callback: sendUnaryData<PrevalidateDataItemResponse>): void {
+  prevalidateDataItem(
+    call: ServerUnaryCall<
+      PrevalidateDataItemRequest,
+      PrevalidateDataItemResponse
+    >,
+    callback: sendUnaryData<PrevalidateDataItemResponse>
+  ): void {
     try {
       const config = JSON.parse(call.request.config!.serialized_config);
       const request_item = call.request.data_item;
       const item = {
         key: request_item?.key,
-        value: JSON.parse(request_item!.value)
+        value: JSON.parse(request_item!.value),
       };
 
       // Check if data item is defined
       if (!item.value) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: 'Value in data item is not defined' });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: 'Value in data item is not defined',
+        });
         callback(null, response);
         return;
       }
 
       // Check if block is defined
       if (!item.value.block) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: 'Block in data item is not defined' });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: 'Block in data item is not defined',
+        });
         callback(null, response);
         return;
       }
 
       // Check if block results is defined
       if (!item.value.block_results) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: 'Block results in data item is not defined' });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: 'Block results in data item is not defined',
+        });
         callback(null, response);
         return;
       }
 
       // Check if block height matches
       if (item.key !== item.value.block.block.header.height) {
-        const response = PrevalidateDataItemResponse.create(
-          {
-            valid: false,
-            error: `Block height does not match: key${item.key} value:${item.value.block.block.header.height}`
-          });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: `Block height does not match: key${item.key} value:${item.value.block.block.header.height}`,
+        });
         callback(null, response);
         return;
       }
 
       // Check if block results height matches
       if (item.key !== item.value.block_results.height) {
-        const response = PrevalidateDataItemResponse.create(
-          {
-            valid: false,
-            error: `Block results height does not match: key${item.key} value:${item.value.block_results.height}`
-          });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: `Block results height does not match: key${item.key} value:${item.value.block_results.height}`,
+        });
         callback(null, response);
         return;
       }
 
       // Check if network matches
       if (config.network !== item.value.block.block.header.chain_id) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: 'Chain ID does not match' });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: 'Chain ID does not match',
+        });
         callback(null, response);
         return;
       }
@@ -180,8 +208,10 @@ export class TendermintServer implements RuntimeServiceServer {
       // validate block schema
       const block_validate = ajv.compile(block_schema);
       if (!block_validate(item.value.block)) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: `Block schema validation failed: ${block_validate.errors}` });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: `Block schema validation failed: ${block_validate.errors}`,
+        });
         callback(null, response);
         return;
       }
@@ -189,8 +219,10 @@ export class TendermintServer implements RuntimeServiceServer {
       // validate block_results schema
       const block_results_validate = ajv.compile(block_results_schema);
       if (!block_results_validate(item.value.block_results)) {
-        const response = PrevalidateDataItemResponse.create(
-          { valid: false, error: `Block results schema validation failed: ${block_results_validate.errors}` });
+        const response = PrevalidateDataItemResponse.create({
+          valid: false,
+          error: `Block results schema validation failed: ${block_results_validate.errors}`,
+        });
         callback(null, response);
         return;
       }
@@ -200,25 +232,28 @@ export class TendermintServer implements RuntimeServiceServer {
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  transformDataItem(call: ServerUnaryCall<TransformDataItemRequest, TransformDataItemResponse>, callback: sendUnaryData<TransformDataItemResponse>): void {
+  transformDataItem(
+    call: ServerUnaryCall<TransformDataItemRequest, TransformDataItemResponse>,
+    callback: sendUnaryData<TransformDataItemResponse>
+  ): void {
     try {
       const request_item = call.request.data_item;
       const item = {
         key: request_item!.key,
-        value: JSON.parse(request_item!.value)
+        value: JSON.parse(request_item!.value),
       };
 
       const compareEventAttribute = (a: any, b: any) =>
         a.key.toLowerCase() > b.key.toLowerCase()
           ? 1
           : b.key.toLowerCase() > a.key.toLowerCase()
-            ? -1
-            : 0;
+          ? -1
+          : 0;
 
       if (item.value.block_results.begin_block_events) {
         item.value.block_results.begin_block_events =
@@ -272,35 +307,44 @@ export class TendermintServer implements RuntimeServiceServer {
       // Construct the data_item to return
       const transformed_data_item = {
         key: item.key,
-        value: JSON.stringify(item.value)
+        value: JSON.stringify(item.value),
       };
 
-      callback(null, TransformDataItemResponse.create({ transformed_data_item }));
+      callback(
+        null,
+        TransformDataItemResponse.create({ transformed_data_item })
+      );
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  validateDataItem(call: ServerUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>, callback: sendUnaryData<ValidateDataItemResponse>): void {
+  validateDataItem(
+    call: ServerUnaryCall<ValidateDataItemRequest, ValidateDataItemResponse>,
+    callback: sendUnaryData<ValidateDataItemResponse>
+  ): void {
     try {
       const request_proposed_data_item = call.request.proposed_data_item;
       const request_validation_data_item = call.request.validation_data_item;
       const proposedDataItem = {
         key: request_proposed_data_item!.key,
-        value: JSON.parse(request_proposed_data_item!.value)
+        value: JSON.parse(request_proposed_data_item!.value),
       };
       const validationDataItem = {
         key: request_validation_data_item!.key,
-        value: JSON.parse(request_validation_data_item!.value)
+        value: JSON.parse(request_validation_data_item!.value),
       };
 
       if (
         JSON.stringify(proposedDataItem) === JSON.stringify(validationDataItem)
       ) {
-        callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_VALID }));
+        callback(
+          null,
+          ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_VALID })
+        );
         return;
       }
 
@@ -317,44 +361,66 @@ export class TendermintServer implements RuntimeServiceServer {
           JSON.stringify(validationDataItem)
         ) {
           // vote abstain if begin_block_events are not equal
-          callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_ABSTAIN }));
+          callback(
+            null,
+            ValidateDataItemResponse.create({
+              vote: VoteType.VOTE_TYPE_ABSTAIN,
+            })
+          );
           return;
         }
       }
 
       // vote invalid if data does not match
-      callback(null, ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_INVALID }));
+      callback(
+        null,
+        ValidateDataItemResponse.create({ vote: VoteType.VOTE_TYPE_INVALID })
+      );
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  summarizeDataBundle(call: ServerUnaryCall<SummarizeDataBundleRequest, SummarizeDataBundleResponse>, callback: sendUnaryData<SummarizeDataBundleResponse>): void {
+  summarizeDataBundle(
+    call: ServerUnaryCall<
+      SummarizeDataBundleRequest,
+      SummarizeDataBundleResponse
+    >,
+    callback: sendUnaryData<SummarizeDataBundleResponse>
+  ): void {
     try {
       const grpcBundle = call.request.bundle;
 
       const bundle = grpcBundle.map((item: any) => ({
         key: item.key,
-        value: JSON.parse(item.value)
+        value: JSON.parse(item.value),
       }));
 
       // Get the latest block height from the last item in the bundle
       const latestBlockHeight =
         bundle[bundle.length - 1]?.value?.block?.block?.header?.height || '';
 
-      callback(null, SummarizeDataBundleResponse.create({ summary: latestBlockHeight.toString() }));
+      callback(
+        null,
+        SummarizeDataBundleResponse.create({
+          summary: latestBlockHeight.toString(),
+        })
+      );
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
 
-  nextKey(call: ServerUnaryCall<NextKeyRequest, NextKeyResponse>, callback: sendUnaryData<NextKeyResponse>): void {
+  nextKey(
+    call: ServerUnaryCall<NextKeyRequest, NextKeyResponse>,
+    callback: sendUnaryData<NextKeyResponse>
+  ): void {
     try {
       const key = call.request.key;
 
@@ -365,7 +431,7 @@ export class TendermintServer implements RuntimeServiceServer {
     } catch (error: any) {
       callback({
         code: grpc.status.INTERNAL,
-        details: error.message
+        details: error.message,
       });
     }
   }
