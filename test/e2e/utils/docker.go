@@ -47,16 +47,14 @@ var (
 		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
 	}
 	testapiImage = docker.Image{
-		Path:      "testapi",
-		Tags:      []string{"testapi"},
-		Labels:    map[string]string{cleanupLabel: ""},
-		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+		Path:   "testapi",
+		Tags:   []string{"testapi"},
+		Labels: map[string]string{cleanupLabel: ""},
 	}
 	kystrapImage = docker.Image{
-		Path:      rootPath + "tools/kystrap",
-		Tags:      []string{"kystrap-e2etest"},
-		Labels:    map[string]string{cleanupLabel: ""},
-		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+		Path:   rootPath + "tools/kystrap",
+		Tags:   []string{"kystrap-e2etest"},
+		Labels: map[string]string{cleanupLabel: ""},
 	}
 )
 
