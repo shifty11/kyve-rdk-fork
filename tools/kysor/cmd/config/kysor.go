@@ -29,10 +29,9 @@ var FlagHome = commoncmd.StringFlag{
 var config *KysorConfig
 
 type KysorConfig struct {
-	ChainID              string `koanf:"chainId"`
-	RPC                  string `koanf:"rpc"`
-	REST                 string `koanf:"rest"`
-	AutoDownloadBinaries bool   `koanf:"autoDownloadBinaries"`
+	ChainID string `koanf:"chainId"`
+	RPC     string `koanf:"rpc"`
+	REST    string `koanf:"rest"`
 }
 
 func (c KysorConfig) GetDenom() string {
