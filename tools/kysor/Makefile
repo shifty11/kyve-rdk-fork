@@ -29,7 +29,7 @@ ARCH ?= $(BUILDARCH)
 ###############################################################################
 
 PLATFORMS=linux darwin
-VERSION ?= (dev)
+VERSION ?= notset
 DOCKER_IMAGE_NAME ?= kysor
 BINARY_NAME ?= kysor
 CGO_ENABLED=0
@@ -54,8 +54,8 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 ###############################################################################
 
 ensure_version:
-ifneq ($(GO_VERSION),1.21)
-	$(error ❌  Please run Go v1.21.x..)
+ifneq ($(GO_VERSION),1.22)
+	$(error ❌  Please run Go v1.22.x..)
 endif
 
 ###############################################################################

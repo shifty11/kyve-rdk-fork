@@ -1,6 +1,6 @@
 module github.com/KYVENetwork/kyve-rdk/tools/kystrap
 
-go 1.21.6
+go 1.22.0
 
 require (
 	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240226172902-0f04e0efb7a3
@@ -22,7 +22,7 @@ require (
 	cosmossdk.io/errors v1.0.0 // indirect
 	cosmossdk.io/math v1.2.0 // indirect
 	github.com/4meepo/tagalign v1.3.3 // indirect
-	github.com/Abirdcfly/dupword v0.0.13 // indirect§1
+	github.com/Abirdcfly/dupword v0.0.13 // indirect; indirect§1
 	github.com/Antonboom/errname v0.1.12 // indirect
 	github.com/Antonboom/nilnil v0.1.7 // indirect
 	github.com/Antonboom/testifylint v0.2.3 // indirect

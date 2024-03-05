@@ -1,6 +1,6 @@
 {
   "name": "@runtime/{{ .name }}",
-  "version": "{{ .version }}",
+  "version": "(none)",
   "license": "Apache-2.0",
   "scripts": {
     "build": "rimraf dist && tsc",

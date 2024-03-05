@@ -18,7 +18,7 @@ func versionCmd() *cobra.Command {
 		Use:   "version",
 		Short: "Show KYSOR version",
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Kysor version:%s\n", Version)
+			fmt.Printf("Kysor version: %s\n", Version)
 			if Tag != "" {
 				fmt.Printf("Git tag: %s\n", Tag)
 			}

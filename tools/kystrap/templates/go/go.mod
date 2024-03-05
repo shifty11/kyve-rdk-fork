@@ -1,6 +1,6 @@
-module github.com/KYVENetwork/kyve-rdk/integrations/{{ .name }}
+module github.com/KYVENetwork/kyve-rdk/runtime/{{ .name }}
 
-go {{ .lang.go.version.patch }}
+go {{ .lang.go.version.full }}
 
 require (
 	google.golang.org/grpc v1.59.0

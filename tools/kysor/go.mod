@@ -1,14 +1,15 @@
 module github.com/KYVENetwork/kyve-rdk/tools/kysor
 
-go 1.21.6
+go 1.22.0
 
 require (
 	github.com/KYVENetwork/chain v1.4.0
-	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240226172902-0f04e0efb7a3
+	github.com/KYVENetwork/kyve-rdk/common/goutils v0.0.0-20240304152107-f836848d458c
 	github.com/cometbft/cometbft v0.37.2
 	github.com/cosmos/cosmos-sdk v0.47.6
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/docker/docker v25.0.2+incompatible
+	github.com/docker/go-connections v0.5.0
 	github.com/fatih/color v1.16.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/golangci/golangci-lint v1.55.1
@@ -117,7 +118,6 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
-	github.com/docker/go-connections v0.5.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect

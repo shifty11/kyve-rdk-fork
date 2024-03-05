@@ -67,7 +67,7 @@ func ValidatePathExists(input string) error {
 		return err
 	}
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return fmt.Errorf("path does not exist")
+		return fmt.Errorf("path `%s` does not exist", path)
 	}
 	return nil
 }

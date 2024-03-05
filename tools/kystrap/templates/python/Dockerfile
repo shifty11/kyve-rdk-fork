@@ -1,6 +1,8 @@
 # Use the official Python image as the base image
 FROM python:3.12
 
+ARG VERSION
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -14,6 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY main.py settings.py ./
 COPY proto ./proto
 COPY server ./server
+
+# Update the version in the settings.py file
+RUN sed -i "s/RUNTIME_VERSION = '.*'/RUNTIME_VERSION = '$VERSION'/" settings.py
 
 # Expose the gRPC port
 EXPOSE 50051

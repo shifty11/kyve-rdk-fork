@@ -38,10 +38,24 @@ const (
 	kystrapMount = "/app/out"
 )
 
+var defaultVersion = "1.0.0-test"
 var (
-	protocolImage = docker.Image{Path: rootPath + "protocol/core", Tags: []string{"protocol"}, Labels: map[string]string{cleanupLabel: ""}}
-	testapiImage  = docker.Image{Path: "testapi", Tags: []string{"testapi"}, Labels: map[string]string{cleanupLabel: ""}}
-	kystrapImage  = docker.Image{Path: rootPath + "tools/kystrap", Tags: []string{"kystrap-e2etest"}, Labels: map[string]string{cleanupLabel: ""}}
+	protocolImage = docker.Image{
+		Path:      rootPath + "protocol/core",
+		Tags:      []string{"protocol"},
+		Labels:    map[string]string{cleanupLabel: ""},
+		BuildArgs: map[string]*string{"VERSION": &defaultVersion},
+	}
+	testapiImage = docker.Image{
+		Path:   "testapi",
+		Tags:   []string{"testapi"},
+		Labels: map[string]string{cleanupLabel: ""},
+	}
+	kystrapImage = docker.Image{
+		Path:   rootPath + "tools/kystrap",
+		Tags:   []string{"kystrap-e2etest"},
+		Labels: map[string]string{cleanupLabel: ""},
+	}
 )
 
 type IntegrationBuilder struct {
@@ -116,9 +130,10 @@ func (pc *IntegrationBuilder) BuildRuntimes(testConfigs []*TestConfig) error {
 			return err
 		}
 		runtimeConfigs = append(runtimeConfigs, docker.Image{
-			Path:   cfg.Runtime.Path,
-			Tags:   []string{runtimeImage(cfg.Runtime)},
-			Labels: map[string]string{cleanupLabel: ""},
+			Path:      cfg.Runtime.Path,
+			Tags:      []string{runtimeImage(cfg.Runtime)},
+			Labels:    map[string]string{cleanupLabel: ""},
+			BuildArgs: map[string]*string{"VERSION": &defaultVersion},
 		})
 	}
 

@@ -3,11 +3,19 @@
 #################  Build Stage 1 #################
 FROM node:lts AS build
 
+ARG VERSION
+
+# Install jq
+RUN apt-get update && apt-get install -y jq
+
 # Set the working directory
 WORKDIR /usr/src/app
 
 # Copy necessary files for installing dependencies
 COPY package.json tsconfig.json ./
+
+# Update the version in the package.json file
+RUN jq --arg VERSION "$VERSION" '.version=$VERSION' package.json > tmp.json && mv tmp.json package.json
 
 # Install dependencies
 RUN yarn install
@@ -40,6 +48,7 @@ CMD /bin/bash -c "set -a; source .env &>0; set +a; \
     --request-backoff \$REQUEST_BACKOFF \
     --cache \$CACHE \
     --metrics \$METRICS \
+    --metrics-port \$METRICS_PORT \
     --valaccount VALACCOUNT \
     --chain-id \$CHAIN_ID \
     --rpc \$RPC \

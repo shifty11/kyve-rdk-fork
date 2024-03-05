@@ -8,7 +8,6 @@ import (
 	"github.com/chzyer/readline"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
 type noBellStdout struct{}
@@ -25,111 +24,6 @@ func (n *noBellStdout) Close() error {
 }
 
 var NoBellStdout = &noBellStdout{}
-
-// AddStringFlags adds the given string flags to the given command.
-// If a flag is required it will be marked as required.
-func AddStringFlags(cmd *cobra.Command, flags []StringFlag) {
-	for _, f := range flags {
-		cmd.Flags().StringP(f.Name, f.Short, f.DefaultValue, f.Usage)
-		if f.Required {
-			err := cmd.MarkFlagRequired(f.Name)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
-// AddBoolFlags adds the given bool flags to the given command.
-// If a flag is required it will be marked as required.
-func AddBoolFlags(cmd *cobra.Command, flags []BoolFlag) {
-	for _, f := range flags {
-		cmd.Flags().BoolP(f.Name, f.Short, f.DefaultValue, f.Usage)
-		if f.Required {
-			err := cmd.MarkFlagRequired(f.Name)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
-// AddIntFlags adds the given int flags to the given command.
-// If a flag is required it will be marked as required.
-func AddIntFlags(cmd *cobra.Command, flags []IntFlag) {
-	for _, f := range flags {
-		cmd.Flags().Int64P(f.Name, f.Short, f.DefaultValue, f.Usage)
-		if f.Required {
-			err := cmd.MarkFlagRequired(f.Name)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
-// AddOptionFlags adds the given option flags to the given command.
-// If a flag is required it will be marked as required.
-func AddOptionFlags[T any](cmd *cobra.Command, flags []OptionFlag[T]) {
-	for _, f := range flags {
-		var defaultValue string
-		if f.DefaultValue != nil {
-			defaultValue = f.DefaultValue.Name()
-		}
-		cmd.Flags().StringP(f.Name, f.Short, defaultValue, f.Usage)
-		if f.Required {
-			err := cmd.MarkFlagRequired(f.Name)
-			if err != nil {
-				panic(err)
-			}
-		}
-	}
-}
-
-// IsInteractive returns true if the non-interactive flag was not set.
-func IsInteractive(cmd *cobra.Command) bool {
-	return !cmd.Flags().Changed(FlagNonInteractive.Name)
-}
-
-// SetupInteractiveMode sets up the interactive mode for the given command.
-// This means that all flags are not required anymore.
-// Load the config file before running this function.
-func SetupInteractiveMode(cmd *cobra.Command, _ []string) error {
-	if IsInteractive(cmd) {
-		cmd.Flags().VisitAll(func(f *pflag.Flag) {
-			for val, annotation := range f.Annotations {
-				if val == cobra.BashCompOneRequiredFlag {
-					annotation[0] = "false"
-				}
-			}
-		})
-	}
-	return nil
-}
-
-func AddPersistentStringFlags(cmd *cobra.Command, flags []StringFlag) {
-	for _, f := range flags {
-		cmd.PersistentFlags().StringP(f.Name, f.Short, f.DefaultValue, f.Usage)
-	}
-}
-
-func AddPersistentBoolFlags(cmd *cobra.Command, flags []BoolFlag) {
-	for _, f := range flags {
-		cmd.PersistentFlags().BoolP(f.Name, f.Short, f.DefaultValue, f.Usage)
-	}
-}
-
-func CombineFuncs(funcs ...cobra.PositionalArgs) cobra.PositionalArgs {
-	return func(cmd *cobra.Command, args []string) error {
-		for _, f := range funcs {
-			err := f(cmd, args)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-}
 
 func getPromptString(cmd *cobra.Command) string {
 	return fmt.Sprintf("%s - %s", cmd.Name(), cmd.Short)
@@ -166,15 +60,52 @@ func PromptCmd(options []*cobra.Command) (*cobra.Command, error) {
 	return nil, fmt.Errorf("invalid option: %s", result)
 }
 
-// GetStringFromPromptOrFlag returns the string value from
-// 1. the given flag
-// 2. prompts the user for the value if the flag was not set
-func GetStringFromPromptOrFlag(cmd *cobra.Command, flag StringFlag) (string, error) {
+type YesNoOption string
+
+const (
+	Yes YesNoOption = "Yes"
+	No  YesNoOption = "No"
+)
+
+func PromptYesNo(label string, defaultValue YesNoOption) (bool, error) {
+	cursorPos := 0
+	if defaultValue == No {
+		cursorPos = 1
+	}
+	prompt := promptui.Select{
+		Label:     label,
+		Items:     []string{string(Yes), string(No)},
+		CursorPos: cursorPos,
+		Stdout:    NoBellStdout,
+	}
+	_, result, err := prompt.Run()
+	if err != nil {
+		return false, err
+	}
+	return result == string(Yes), nil
+}
+
+// GetStringFromFlag returns the string value from the given flag
+func GetStringFromFlag(cmd *cobra.Command, flag StringFlag) (string, error) {
 	value, err := cmd.Flags().GetString(flag.Name)
 	if err != nil {
 		return "", err
 	}
 
+	// If the flag was set and a validation function exists, we need to validate the value
+	if cmd.Flags().Changed(flag.Name) && flag.ValidateFn != nil {
+		err = flag.ValidateFn(value)
+		if err != nil {
+			return "", err
+		}
+	}
+	return value, nil
+}
+
+// GetStringFromPromptOrFlag returns the string value from
+// 1. the given flag
+// 2. prompts the user for the value if the flag was not set
+func GetStringFromPromptOrFlag(cmd *cobra.Command, flag StringFlag) (string, error) {
 	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
 		// Only prompt if we are in interactive mode and the flag was not set
 		label := flag.Prompt
@@ -189,16 +120,9 @@ func GetStringFromPromptOrFlag(cmd *cobra.Command, flag StringFlag) (string, err
 			Stdout:   NoBellStdout,
 		}
 		return prompt.Run()
-	} else if cmd.Flags().Changed(flag.Name) {
-		// If the flag was set we need to validate it (if a validation function is set)
-		if flag.ValidateFn != nil {
-			err = flag.ValidateFn(value)
-			if err != nil {
-				return "", err
-			}
-		}
+	} else {
+		return GetStringFromFlag(cmd, flag)
 	}
-	return value, nil
 }
 
 // GetBoolFromPromptOrFlag returns the bool value from
@@ -212,9 +136,9 @@ func GetBoolFromPromptOrFlag(cmd *cobra.Command, flag BoolFlag) (bool, error) {
 
 	if IsInteractive(cmd) && !cmd.Flags().Changed(flag.Name) {
 		// Only prompt if we are in interactive mode and the flag was not set
-		cursorPos := 0
+		defaultValue := Yes
 		if !value {
-			cursorPos = 1
+			defaultValue = No
 		}
 
 		label := flag.Prompt
@@ -222,17 +146,7 @@ func GetBoolFromPromptOrFlag(cmd *cobra.Command, flag BoolFlag) (bool, error) {
 			label = flag.Usage
 		}
 
-		prompt := promptui.Select{
-			Label:     label,
-			Items:     []string{"Yes", "No"},
-			CursorPos: cursorPos,
-			Stdout:    NoBellStdout,
-		}
-		_, result, err := prompt.Run()
-		if err != nil {
-			return false, err
-		}
-		return result == "Yes", nil
+		return PromptYesNo(label, defaultValue)
 	}
 	return value, nil
 }
