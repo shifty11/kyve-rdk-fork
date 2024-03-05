@@ -41,10 +41,11 @@ import (
 )
 
 const (
-	// globalCleanupLabel labels all containers and images created by kysor. It can be used to remove all kysor containers and images
-	globalCleanupLabel = "kysor-all"
-	protocolPath       = "protocol/core"
-	runtimePath        = "runtime"
+	// globalContainerLabel labels all containers and images created by kysor.
+	// It can be used to address all containers and images created by kysor.
+	globalContainerLabel = "kysor-all"
+	protocolPath         = "protocol/core"
+	runtimePath          = "runtime"
 )
 
 type Runtime struct {
@@ -325,7 +326,7 @@ func buildImages(
 		protocolImage = docker.Image{
 			Path:      options.ProtocolBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, "local")},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	} else {
@@ -335,7 +336,7 @@ func buildImages(
 		protocolImage = docker.Image{
 			Path:      protocol.path,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	}
@@ -346,7 +347,7 @@ func buildImages(
 		runtimeImage = docker.Image{
 			Path:      options.RuntimeBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, "local")},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	} else {
@@ -356,7 +357,7 @@ func buildImages(
 		runtimeImage = docker.Image{
 			Path:      runtime.path,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, runtime.ver.String())},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	}
@@ -403,7 +404,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 
 	err = docker.CreateNetwork(ctx, cli, docker.NetworkConfig{
 		Name:   label,
-		Labels: map[string]string{globalCleanupLabel: "", label: ""},
+		Labels: map[string]string{globalContainerLabel: "", label: ""},
 	})
 	if err != nil {
 		return nil, nil, err
@@ -423,7 +424,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:         protocolName,
 		Network:      label,
 		Env:          env,
-		Labels:       map[string]string{globalCleanupLabel: "", label: ""},
+		Labels:       map[string]string{globalContainerLabel: "", label: ""},
 		ExposedPorts: exposedPorts,
 	}
 
@@ -432,7 +433,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:       runtimeName,
 		Network:    label,
 		Env:        runtimeEnv,
-		Labels:     map[string]string{globalCleanupLabel: "", label: ""},
+		Labels:     map[string]string{globalContainerLabel: "", label: ""},
 		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
