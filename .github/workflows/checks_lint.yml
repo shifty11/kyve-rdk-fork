@@ -19,14 +19,15 @@ jobs:
           go-version-file: 'tools/kysor/go.mod'
           cache-dependency-path: 'tools/kysor/go.sum'
       # Install nodejs
-      - name: "nodejs install"
-        uses: actions/setup-node@v3
+      - name: Install nodejs
+        uses: actions/setup-node@v4
       # Install yarn
-      - name: install yarn
+      - name: Install yarn
         run: npm install --global yarn
-      # Run yarn setup
-      - name: "setup"
-        run: yarn setup
+      # Run yarn install
+      - name: Run yarn install
+        run: yarn install
+        working-directory: protocol/core
       # Lint all modules and packages
       - name: Lint all
         run: make lint
