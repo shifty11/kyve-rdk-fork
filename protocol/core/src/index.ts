@@ -47,7 +47,7 @@ import {
   waitForUploadInterval,
 } from "./methods";
 
-import { ICacheProvider, IMetrics, IRuntime } from "./types";
+import { ICacheProvider, IMetrics, IRuntime, ProtocolConfig } from "./types";
 import { IDLE_TIME, sleep, standardizeError } from "./utils";
 
 import { SupportedChains } from "@kyvejs/sdk/dist/constants";
@@ -163,12 +163,11 @@ export class Validator {
    * runtime class here in order to run the
    *
    * @method constructor
-   * @param host the host of the protocol core
-   * @param port the port of the protocol core
+   * @param {ProtocolConfig} protocolConfig that defines the runtime
    */
-  constructor(host: string, port: number) {
+  constructor(protocolConfig: Partial<ProtocolConfig>) {
     // set provided runtime
-    this.runtime = new GrpcRuntime(host, port);
+    this.runtime = new GrpcRuntime(protocolConfig);
 
     // set @kyvejs/protocol version
     this.protocolVersion = protocolVersion;
@@ -350,7 +349,6 @@ export * from "./types";
 // export utils
 export * from "./utils";
 
-new Validator(
-  process.env.HOST || "locahost",
-  parseInt(process.env.PORT || "50051")
-).bootstrap();
+// entrypoint import has to be here because of circular dependency
+// overwrite the entrypoint for docker builds
+import "./entrypoint";

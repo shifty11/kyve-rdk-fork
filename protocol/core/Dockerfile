@@ -23,6 +23,9 @@ RUN yarn install
 # Copy source files
 COPY ./src ./src
 
+# Override the entrypoint to use the docker entrypoint
+COPY ./src/entrypoint_docker.ts ./src/entrypoint.ts
+
 # Build the docker core
 RUN yarn run build:binaries
 

@@ -4,6 +4,7 @@ import {
   PrevalidateDataItemResponse,
   RuntimeServiceServer,
 } from "../../src/proto/kyverdk/runtime/v1/runtime";
+import { DirectChannel } from "./grpcChannel.mock";
 
 export const TestRuntime = jest.fn().mockImplementation(() => {
   return {
@@ -52,7 +53,8 @@ export const newTestValidator = (): Validator => {
   };
   const config: Partial<ProtocolConfig> = {
     useGrpc: false,
-    services: runtimeServices,
+    // @ts-ignore
+    channelOverride: new DirectChannel(runtimeServices),
   };
   const v = new Validator(config);
   v["runtime"] = runtime;
