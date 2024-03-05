@@ -12,8 +12,7 @@ import {
   RuntimeServiceClient,
   DataItem,
 } from "../proto/kyverdk/runtime/v1/runtime";
-import { DirectChannel } from "./direct-channel";
-import { IRuntime, ProtocolConfig } from "../types";
+import { IRuntime } from "../types";
 import { ClientOptions } from "@grpc/grpc-js";
 
 // config is a serialized string
@@ -25,19 +24,13 @@ export default class GrpcRuntime implements IRuntime {
 
   public config!: IConfig;
 
-  constructor(protocolConfig: Partial<ProtocolConfig>) {
+  constructor(host: string, port: number) {
     const options: Partial<ClientOptions> = {
       "grpc.max_send_message_length": maxMessageSize,
       "grpc.max_receive_message_length": maxMessageSize,
     };
-    if (!protocolConfig.useGrpc) {
-      if (protocolConfig.services === undefined) {
-        throw new Error("runConfig.services is undefined");
-      }
-      options.channelOverride = new DirectChannel(protocolConfig.services);
-    }
     this.grpcClient = new RuntimeServiceClient(
-      `${protocolConfig.host || "localhost"}:${protocolConfig.port || 50051}`,
+      `${host || "localhost"}:${port || 50051}`,
       grpc.credentials.createInsecure(),
       options
     );
