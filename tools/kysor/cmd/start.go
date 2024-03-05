@@ -387,10 +387,20 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
+	rpc, err := config.GetConfigX().GetWorkingRPC()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rest, err := config.GetConfigX().GetWorkingREST()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
 		Valaccount:  valConfig.Valaccount,
-		RpcAddress:  config.GetConfigX().RPC,
-		RestAddress: config.GetConfigX().REST,
+		RpcAddress:  rpc,
+		RestAddress: rest,
 		Host:        runtimeName,
 		PoolId:      pool.Id,
 		Debug:       debug,
