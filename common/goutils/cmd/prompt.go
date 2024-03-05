@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/chzyer/readline"
 	"github.com/manifoldco/promptui"
@@ -217,11 +218,15 @@ func GetOptionFromPrompt[T any](flag OptionFlag[T]) (Option[T], error) {
 	}
 
 	prompt := promptui.Select{
-		Label:     label,
-		Items:     items,
-		Stdout:    NoBellStdout,
-		Size:      size,
-		CursorPos: cursorPos,
+		Label:             label,
+		Items:             items,
+		Stdout:            NoBellStdout,
+		Size:              size,
+		CursorPos:         cursorPos,
+		StartInSearchMode: flag.StartInSearchMode,
+		Searcher: func(input string, index int) bool {
+			return strings.Contains(strings.ToLower(items[index]), input)
+		},
 	}
 	_, result, err := prompt.Run()
 	if err != nil {
