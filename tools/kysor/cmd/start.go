@@ -679,11 +679,12 @@ func validateVersionOrEmpty(s string) error {
 
 var (
 	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
-		Name:             "valaccount",
-		Short:            "v",
-		Usage:            "Name of the valaccount to run",
-		Required:         true,
-		MaxSelectionSize: 10,
+		Name:              "valaccount",
+		Short:             "v",
+		Usage:             "Name of the valaccount to run",
+		Required:          true,
+		MaxSelectionSize:  10,
+		StartInSearchMode: true,
 	}
 	flagStartEnvFile = commoncmd.StringFlag{
 		Name:       "env-file",
