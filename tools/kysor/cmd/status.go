@@ -60,7 +60,7 @@ func statusCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:     "status",
 		Short:   "Show KYSOR status",
-		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, config.LoadConfigs, commoncmd.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, utils.CheckUpdateAvailable, config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {

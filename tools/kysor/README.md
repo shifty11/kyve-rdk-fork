@@ -21,7 +21,7 @@ Without KYSOR for every pool the node runner has to build and run the protocol n
 - Automatically **download** and **run** the correct runtime/protocol version
 - Getting the new runtime upgrade during a pool upgrade **automatically** and therefore **don't risk timeout slashes**
 
-**Installation**
+### Installation/Update
 
 Get the latest release of the KYSOR binaries [here](https://github.com/KYVENetwork/kyve-rdk/releases?q=kysor&expanded=true)
 
@@ -54,7 +54,7 @@ To verify that the KYSOR runs successfully just run
 ./kysor version
 ```
 
-**Initialize KYSOR**
+### Initialize KYSOR
 
 Once you have successfully downloaded the KYSOR binary you have to initialize it.
 
@@ -97,7 +97,7 @@ More help on how to manage valaccounts can be found with `./kysor valaccounts [s
 > If you have multiple valaccounts running on the same machine you are required to change the port of the metrics server (if enabled of course) so they don't overlap.
 
 
-**Run KYSOR**
+### Run KYSOR
 
 After you have created the required valaccounts you can simply start running the KYSOR with the following command:
 
@@ -116,12 +116,7 @@ To see all available flags you can use the `--help` flag like this:
 ./kysor start --help
 ```
 
-**Stop KYSOR**
-```bash
-./kysor stop
-```
-
-**Run KYSOR with systemd**
+### Run KYSOR with systemd
 
 For the daemon service root-privileges are required during the setup. 
 Create a service file. $USER is the Linux user which runs the process. Replace it before you copy the command.
@@ -162,4 +157,9 @@ You can see its logs with
 
 ```
 sudo journalctl -u cosmoshubd -f
+```
+
+### Stop KYSOR
+```bash
+./kysor stop
 ```

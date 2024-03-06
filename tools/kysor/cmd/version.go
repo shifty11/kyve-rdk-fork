@@ -2,27 +2,26 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 	"runtime"
 
 	"github.com/spf13/cobra"
 )
 
-var (
-	Version = "(none)"
-	Commit  = "(none)"
-	Tag     = ""
-)
-
 func versionCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "version",
-		Short: "Show KYSOR version",
+		Use:     "version",
+		Short:   "Show KYSOR version",
+		PreRunE: utils.CheckUpdateAvailable,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Printf("Kysor version: %s\n", Version)
-			if Tag != "" {
-				fmt.Printf("Git tag: %s\n", Tag)
+			fmt.Printf("Kysor version: %s\n", types.Version)
+			if types.Tag != "" {
+				fmt.Printf("Git tag: %s\n", types.Tag)
 			}
-			fmt.Printf("Git commit: %s\n", Commit)
+			if types.Commit != "" {
+				fmt.Printf("Git commit: %s\n", types.Commit)
+			}
 			fmt.Println()
 			fmt.Printf("Go version: %s\n", runtime.Version())
 			fmt.Println()

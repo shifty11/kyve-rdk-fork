@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 
 	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
@@ -71,7 +72,7 @@ func initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "init",
 		Short:   "Initialize KYSOR",
-		PreRunE: commoncmd.SetupInteractiveMode,
+		PreRunE: commoncmd.CombineFuncs(utils.CheckUpdateAvailable, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path, err := config.GetConfigFilePath(cmd)
 			if err != nil {

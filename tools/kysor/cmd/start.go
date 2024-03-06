@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types"
 	"io"
 	"os"
 	"os/signal"
@@ -208,18 +209,14 @@ func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
 
 // pullRepo clones or pulls the kyve-rdk repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
-	// TODO: change this branch to github.com/KYVENetwork/kyve-rdk once it's ready
-	repoName := "github.com/shifty11/kyve-rdk-fork"
-	repoUrl := fmt.Sprintf("https://%s.git", repoName)
-
 	var repo *git.Repository
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
 		// Clone the given repository to the given directory
 		if !silent {
-			fmt.Printf("📥  Cloning %s\n", repoUrl)
+			fmt.Printf("📥  Cloning %s\n", types.RepoUrl)
 		}
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
-			URL:      repoUrl,
+			URL:      types.RepoUrl,
 			Progress: os.Stdout,
 		})
 		if err != nil {
@@ -262,7 +259,7 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 
 	return &kyveRepo{
 		repo: repo,
-		name: repoName,
+		name: types.RepoName,
 		dir:  repoDir,
 	}, nil
 }
@@ -871,7 +868,7 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
 		Short:   "Start data validator",
-		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, config.LoadConfigs, commoncmd.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, utils.CheckUpdateAvailable, config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {
