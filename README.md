@@ -11,13 +11,13 @@
 <br/>
 
 <div align="center">
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/license/KYVENetwork/kyvejs?color=green" />
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/license/KYVENetwork/kyve-rdk?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/stars/KYVENetwork/kyvejs?color=green" />
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/stars/KYVENetwork/kyve-rdk?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/contributors/KYVENetwork/kyvejs?color=green" />
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/contributors/KYVENetwork/kyve-rdk?color=green" />
 
-  <img alt="License: Apache-2.0" src="https://badgen.net/github/releases/KYVENetwork/kyvejs?color=green" />
+  <img alt="License: Apache-2.0" src="https://badgen.net/github/releases/KYVENetwork/kyve-rdk?color=green" />
 </div>
 
 <div align="center">
@@ -34,79 +34,75 @@
 
 <br/>
 
-KYVE, a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams, is a solution for Web3 data lakes. For more information on Web3 data lakes, [click here](link). By leveraging permanent data storage solutions like Arweave (a decentralized storage network) and KYVE’s Cosmos SDK chain (a framework for building blockchain applications in Go), we create permanent backups and ensure the scalability, immutability, and availability of these resources over time. For more information on Arweave, [click here](link). For more information on Cosmos SDK, [click here](link).
+KYVE, a protocol that enables data providers to standardize, validate, and permanently store blockchain data streams, is a solution for Web3 data lakes. 
+For more information check out the [KYVE documentation](https://docs.kyve.network/).
 
 ## Project Overview
 
 **Common:**
 
-- [@kyvejs/types](common/types/README.md) - holds all types for the KYVE application in typescript
-- [@kyvejs/sdk](common/sdk/README.md) - development kit for communicating with the KYVE blockchain
-- [@kyvejs/protocol](common/protocol/README.md) - core functionality for running validators on the KYVE network
-- @kyvejs/goutils - go utility functions for this repository
+- common/goutils - go utility functions for this repository
+- common/proto - protocol buffer definitions for this repository
+
+**Protocol:**
+
+- [protocol/core](protocol/core/README.md) - core functionality for running validators on the KYVE network
+
+**Runtime:**
+
+- [runtime/tendermint](runtime/tendermint/README.md) - The official KYVE Tendermint sync runtime
+- [runtime/tendermint-ssync](runtime/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync runtime
+- [runtime/tendermint-bsync](runtime/tendermint-bsync/README.md) - The official KYVE Tendermint block sync runtime
 
 **Tools:**
 
-- [@kyvejs/kysor](tools/kysor/README.md) - The Cosmovisor of KYVE
-- [@kyvejs/kystrap](tools/kystrap/README.md) - A bootstrap tool for creating new KYVE integrations
+- [tools/kysor](tools/kysor/README.md) - The Cosmovisor of KYVE
+- [tools/kystrap](tools/kystrap/README.md) - A bootstrap tool for creating new KYVE runtimes
 
-**Integrations:**
-
-- [@kyvejs/tendermint](integrations/tendermint/README.md) - The official KYVE Tendermint sync integration
-- [@kyvejs/tendermint-ssync](integrations/tendermint-ssync/README.md) - The official KYVE Tendermint state-sync integration
-- [@kyvejs/tendermint-bsync](integrations/tendermint-bsync/README.md) - The official KYVE Tendermint block sync integration
+**Test**
+- test/e2e - end-to-end tests for the KYVE protocol and runtimes
 
 ## What is a KYVE integration?
-A KYVE data validator requires a runtime to validate and store data. 
-A runtime consists of the protocol (client) and the integration (server).
-The protocol is responsible to communicate between the KYVE blockchain and the integration.
+A KYVE data validator requires an integration to validate and store data. 
 
-//TODO: add picture of this workflow (Chain -> Protocol -> Integration) or link
+An integration consists of the protocol core (client) and the runtime (server).<br>
+The protocol core is responsible to communicate between the KYVE blockchain and the runtime and store data blobs on a storage provider (Arweave).
 
+<img src="assets/protocol-validator.jpg" alt="protocol-validator" width="600"/>
 
-## How to write a KYVE integration
+## How to write a KYVE runtime
 
-You can choose to write an integration in Go, Python, or TypeScript. The following steps will guide you through the process of creating a new integration.
+You can choose to write a runtime in Go, Python, or TypeScript. The following steps will guide you through the process of creating a new runtime.
 
 **Prerequisites:**
 - [Docker](https://docs.docker.com/engine/install/)
 
 **Step 1:** Clone the repository and checkout a new branch
 ```bash
-git clone git@github.com:KYVENetwork/kyvejs.git
+git clone git@github.com:KYVENetwork/kyve-rdk.git
 
 # Checkout a new branch
-# git checkout -b [feat/fix]/integration/[my-branch-name]
-git checkout -b feat/integration/fancypants
+# git checkout -b [feat/fix]/runtime/[my-branch-name]
+git checkout -b feat/runtime/fancypants
 ```
 
 **Step 2:** Run kystrap
 ```bash
-# with make
-make bootstrap-integration
-```
-```bash
-# with a shell
-./tools/kystrap/kystrap.sh create
-```
-```bash
-# with yarn
-yarn bootstrap:integration
+make bootstrap-runtime
 ```
 
-Follow the instructions to create a new integration.
-The wizard will create a new folder in `integrations` with the integration name you provided.
+Follow the instructions to create a new runtime.
+The wizard will create a new folder in `runtime/` with the name you provided.
 
-The new integration will contain a `README.md` with further instructions on how to get started.
+The new runtime will contain a `README.md` with further instructions on how to get started.
 
 **NOTE**: The usage of [Conventional Commits](https://conventionalcommits.org) is required when creating PRs and committing to this repository
 
 ## How to release
 
-In order to release new changes which got merged into `main` lerna can be used. Lerna will look into every change and create a new release tag if necessary. After the user has approved the new version tags (bumped according to [Semantic Versioning](https://semver.org/)) lerna will push those new tags to `main`, starting the CI/CD pipeline and creating the releases.
-
-Release with lerna:
-
+New releases are created by merging changes into the `main` branch and running the release script.
+```bash
+make release
 ```
-yarn lerna version
-```
+This creates a release.sh script which can be modified before running it.<br>
+After running the script the CI/CD pipeline will be triggered and the new releases will be created.
