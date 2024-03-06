@@ -76,6 +76,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version-file: ${{ env.WORKING_DIR }}/go.mod
+          cache-dependency-path: ${{ env.WORKING_DIR }}/go.sum
       # Build
       - name: Build
         run: make release

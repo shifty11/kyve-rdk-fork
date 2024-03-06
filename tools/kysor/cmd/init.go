@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/utils"
 
 	commoncmd "github.com/KYVENetwork/kyve-rdk/common/goutils/cmd"
 	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/config"
@@ -65,20 +66,13 @@ var (
 		Required:     true,
 		ValidateFn:   commoncmd.ValidateNotEmpty,
 	}
-	flagAutoDownload = commoncmd.BoolFlag{
-		Name:         "auto-download-binaries",
-		Short:        "d",
-		DefaultValue: true,
-		Usage:        "Allow automatic download and execution of new upgrade binaries",
-		Required:     false,
-	}
 )
 
 func initCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "init",
 		Short:   "Initialize KYSOR",
-		PreRunE: commoncmd.SetupInteractiveMode,
+		PreRunE: commoncmd.CombineFuncs(utils.CheckUpdateAvailable, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			path, err := config.GetConfigFilePath(cmd)
 			if err != nil {
@@ -106,17 +100,11 @@ func initCmd() *cobra.Command {
 				return err
 			}
 
-			autoDownload, err := commoncmd.GetBoolFromPromptOrFlag(cmd, flagAutoDownload)
-			if err != nil {
-				return err
-			}
-
 			// Create the config file
 			kysorConfig := config.KysorConfig{
-				ChainID:              chainID.Value().value,
-				RPC:                  rpc,
-				REST:                 rest,
-				AutoDownloadBinaries: autoDownload,
+				ChainID: chainID.Value().value,
+				RPC:     rpc,
+				REST:    rest,
 			}
 
 			return kysorConfig.Save(path)
@@ -124,7 +112,6 @@ func initCmd() *cobra.Command {
 	}
 	commoncmd.AddOptionFlags(cmd, []commoncmd.OptionFlag[chainId]{flagChainID})
 	commoncmd.AddStringFlags(cmd, []commoncmd.StringFlag{flagRPC, flagREST})
-	commoncmd.AddBoolFlags(cmd, []commoncmd.BoolFlag{flagAutoDownload})
 	return cmd
 }
 

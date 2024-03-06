@@ -2,6 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/hashicorp/go-version"
+	"strings"
 
 	"github.com/docker/docker/client"
 	"github.com/fatih/color"
@@ -79,5 +85,51 @@ func CheckDockerInstalled(_ *cobra.Command, _ []string) error {
 	}
 	//goland:noinspection GoUnhandledErrorResult
 	defer cli.Close()
+	return nil
+}
+
+func CheckUpdateAvailable(_ *cobra.Command, _ []string) error {
+	currentVersion, err := version.NewVersion(types.Version)
+	if err != nil {
+		// Silently ignore the error
+		return nil
+	}
+
+	// Create the remote with repository URL
+	rem := git.NewRemote(memory.NewStorage(), &config.RemoteConfig{
+		Name: "origin",
+		URLs: []string{types.RepoUrl},
+	})
+
+	// We can then use every Remote functions to retrieve wanted information
+	refs, err := rem.List(&git.ListOptions{
+		// Returns all references, including peeled references.
+		PeelingOption: git.AppendPeeled,
+	})
+	if err != nil {
+		return err
+	}
+
+	// Only check for tags that are newer than the current version
+	var latestTag *version.Version
+	for _, ref := range refs {
+		if ref.Name().IsTag() && strings.HasPrefix(ref.Name().Short(), "tools/kysor@") {
+			v, err := version.NewVersion(strings.TrimPrefix(ref.Name().Short(), "tools/kysor@"))
+			if err != nil {
+				continue
+			}
+			if v.GreaterThan(currentVersion) {
+				if latestTag == nil || v.GreaterThan(latestTag) {
+					latestTag = v
+				}
+			}
+		}
+	}
+
+	if latestTag != nil {
+		readmeLink := "/tree/main/tools/kysor#installation-update"
+		updateLink := types.RepoUrl + readmeLink
+		fmt.Printf("🎉  A new version of KYSOR is available: %s\n    Update guide: %s\n\n", latestTag.Original(), updateLink)
+	}
 	return nil
 }

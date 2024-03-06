@@ -2,10 +2,13 @@ package config
 
 import (
 	"fmt"
+	"net"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/mitchellh/go-homedir"
 
@@ -29,10 +32,9 @@ var FlagHome = commoncmd.StringFlag{
 var config *KysorConfig
 
 type KysorConfig struct {
-	ChainID              string `koanf:"chainId"`
-	RPC                  string `koanf:"rpc"`
-	REST                 string `koanf:"rest"`
-	AutoDownloadBinaries bool   `koanf:"autoDownloadBinaries"`
+	ChainID string `koanf:"chainId"`
+	RPC     string `koanf:"rpc"`
+	REST    string `koanf:"rest"`
 }
 
 func (c KysorConfig) GetDenom() string {
@@ -53,6 +55,46 @@ func (c KysorConfig) GetChainPrettyName() string {
 		return "korellia"
 	}
 	return c.ChainID
+}
+
+func (c KysorConfig) GetWorkingRPC() (string, error) {
+	var client = http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: 5 * time.Second,
+			}).DialContext,
+		},
+	}
+
+	// Ping the rpc to check if it is working
+	// If it is not working, try the next one
+	for _, rpc := range strings.Split(c.RPC, ",") {
+		_, err := client.Get(rpc + "/status")
+		if err == nil {
+			return rpc, nil
+		}
+	}
+	return "", fmt.Errorf("no working rpc found")
+}
+
+func (c KysorConfig) GetWorkingREST() (string, error) {
+	var client = http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout: 5 * time.Second,
+			}).DialContext,
+		},
+	}
+
+	// Ping the rest to check if it is working
+	// If it is not working, try the next one
+	for _, rest := range strings.Split(c.REST, ",") {
+		_, err := client.Get(rest)
+		if err == nil {
+			return rest, nil
+		}
+	}
+	return "", fmt.Errorf("no working rest found")
 }
 
 func (c KysorConfig) Save(path string) error {
@@ -168,21 +210,33 @@ func loadKysorConfig(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("error unmarshalling config file: %s", err)
 	}
 
-	// Add port to the RPC and REST URLs if they are missing
-	if !regexp.MustCompile(`:\d+$`).MatchString(config.RPC) {
-		if strings.HasPrefix(config.RPC, "https://") {
-			config.RPC += ":443"
-		} else if strings.HasPrefix(config.RPC, "http://") {
-			config.RPC += ":80"
+	// Add port to the RPC URLs if they are missing
+	var rpcs []string
+	for _, rpc := range strings.Split(config.RPC, ",") {
+		if !regexp.MustCompile(`:\d+$`).MatchString(rpc) {
+			if strings.HasPrefix(rpc, "https://") {
+				rpc += ":443"
+			} else if strings.HasPrefix(rpc, "http://") {
+				rpc += ":80"
+			}
 		}
+		rpcs = append(rpcs, rpc)
 	}
-	if !regexp.MustCompile(`:\d+$`).MatchString(config.REST) {
-		if strings.HasPrefix(config.REST, "https://") {
-			config.REST += ":443"
-		} else if strings.HasPrefix(config.REST, "http://") {
-			config.REST += ":80"
+	config.RPC = strings.Join(rpcs, ",")
+
+	// Add port to the REST URLs if they are missing
+	var rests []string
+	for _, rest := range strings.Split(config.REST, ",") {
+		if !regexp.MustCompile(`:\d+$`).MatchString(rest) {
+			if strings.HasPrefix(rest, "https://") {
+				rest += ":443"
+			} else if strings.HasPrefix(rest, "http://") {
+				rest += ":80"
+			}
 		}
+		rests = append(rests, rest)
 	}
+	config.REST = strings.Join(rests, ",")
 
 	return nil
 }

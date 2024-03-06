@@ -4,7 +4,7 @@ import { ChannelRef } from "@grpc/grpc-js/build/src/channelz";
 import { ServerSurfaceCall } from "@grpc/grpc-js/build/src/server-call";
 import { Call, MessageContext } from "@grpc/grpc-js/build/src/call-interface";
 
-import * as runtime from "../proto/kyverdk/runtime/v1/runtime";
+import * as runtime from "../../src/proto/kyverdk/runtime/v1/runtime";
 import * as Buffer from "buffer";
 
 export class DirectCall implements Call {

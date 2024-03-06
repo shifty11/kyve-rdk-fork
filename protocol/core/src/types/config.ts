@@ -1,8 +1,8 @@
-import { RuntimeServiceServer } from "../proto/kyverdk/runtime/v1/runtime";
+import * as grpc from "@grpc/grpc-js";
 
 export interface ProtocolConfig {
   host: string;
   port: number;
   useGrpc: boolean;
-  services: RuntimeServiceServer | undefined;
+  channelOverride: grpc.Channel | undefined;
 }

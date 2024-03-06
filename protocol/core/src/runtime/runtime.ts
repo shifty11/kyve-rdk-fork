@@ -12,7 +12,6 @@ import {
   RuntimeServiceClient,
   DataItem,
 } from "../proto/kyverdk/runtime/v1/runtime";
-import { DirectChannel } from "./direct-channel";
 import { IRuntime, ProtocolConfig } from "../types";
 import { ClientOptions } from "@grpc/grpc-js";
 
@@ -31,10 +30,10 @@ export default class GrpcRuntime implements IRuntime {
       "grpc.max_receive_message_length": maxMessageSize,
     };
     if (!protocolConfig.useGrpc) {
-      if (protocolConfig.services === undefined) {
-        throw new Error("runConfig.services is undefined");
+      if (protocolConfig.channelOverride === undefined) {
+        throw new Error("protocolConfig.channelOverride  is undefined");
       }
-      options.channelOverride = new DirectChannel(protocolConfig.services);
+      options.channelOverride = protocolConfig.channelOverride;
     }
     this.grpcClient = new RuntimeServiceClient(
       `${protocolConfig.host || "localhost"}:${protocolConfig.port || 50051}`,

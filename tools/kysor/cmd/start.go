@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types"
 	"io"
 	"os"
 	"os/signal"
@@ -41,10 +42,11 @@ import (
 )
 
 const (
-	// globalCleanupLabel labels all containers and images created by kysor. It can be used to remove all kysor containers and images
-	globalCleanupLabel = "kysor-all"
-	protocolPath       = "protocol/core"
-	runtimePath        = "runtime"
+	// globalContainerLabel labels all containers and images created by kysor.
+	// It can be used to address all containers and images created by kysor.
+	globalContainerLabel = "kysor-all"
+	protocolPath         = "protocol/core"
+	runtimePath          = "runtime"
 )
 
 type Runtime struct {
@@ -207,18 +209,14 @@ func getMainBranch(repo *git.Repository) (*plumbing.Reference, error) {
 
 // pullRepo clones or pulls the kyve-rdk repository
 func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
-	// TODO: change this branch to github.com/KYVENetwork/kyve-rdk once it's ready
-	repoName := "github.com/shifty11/kyve-rdk-fork"
-	repoUrl := fmt.Sprintf("https://%s.git", repoName)
-
 	var repo *git.Repository
 	if _, err := os.Stat(repoDir); os.IsNotExist(err) {
 		// Clone the given repository to the given directory
 		if !silent {
-			fmt.Printf("📥  Cloning %s\n", repoUrl)
+			fmt.Printf("📥  Cloning %s\n", types.RepoUrl)
 		}
 		repo, err = git.PlainClone(repoDir, false, &git.CloneOptions{
-			URL:      repoUrl,
+			URL:      types.RepoUrl,
 			Progress: os.Stdout,
 		})
 		if err != nil {
@@ -261,7 +259,7 @@ func pullRepo(repoDir string, silent bool) (*kyveRepo, error) {
 
 	return &kyveRepo{
 		repo: repo,
-		name: repoName,
+		name: types.RepoName,
 		dir:  repoDir,
 	}, nil
 }
@@ -325,7 +323,7 @@ func buildImages(
 		protocolImage = docker.Image{
 			Path:      options.ProtocolBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, "local")},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	} else {
@@ -335,7 +333,7 @@ func buildImages(
 		protocolImage = docker.Image{
 			Path:      protocol.path,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), protocol.name, protocol.ver.String())},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	}
@@ -346,7 +344,7 @@ func buildImages(
 		runtimeImage = docker.Image{
 			Path:      options.RuntimeBuildDir,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, "local")},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	} else {
@@ -356,7 +354,7 @@ func buildImages(
 		runtimeImage = docker.Image{
 			Path:      runtime.path,
 			Tags:      []string{fmt.Sprintf("%s/%s:%s", strings.ToLower(kr.name), runtime.name, runtime.ver.String())},
-			Labels:    map[string]string{globalCleanupLabel: "", label: ""},
+			Labels:    map[string]string{globalContainerLabel: "", label: ""},
 			BuildArgs: map[string]*string{"VERSION": &vers},
 		}
 	}
@@ -386,10 +384,20 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	defer cancel()
 
+	rpc, err := config.GetConfigX().GetWorkingRPC()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rest, err := config.GetConfigX().GetWorkingREST()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	env, err := docker.CreateProtocolEnv(docker.ProtocolEnv{
 		Valaccount:  valConfig.Valaccount,
-		RpcAddress:  config.GetConfigX().RPC,
-		RestAddress: config.GetConfigX().REST,
+		RpcAddress:  rpc,
+		RestAddress: rest,
 		Host:        runtimeName,
 		PoolId:      pool.Id,
 		Debug:       debug,
@@ -403,7 +411,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 
 	err = docker.CreateNetwork(ctx, cli, docker.NetworkConfig{
 		Name:   label,
-		Labels: map[string]string{globalCleanupLabel: "", label: ""},
+		Labels: map[string]string{globalContainerLabel: "", label: ""},
 	})
 	if err != nil {
 		return nil, nil, err
@@ -423,7 +431,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:         protocolName,
 		Network:      label,
 		Env:          env,
-		Labels:       map[string]string{globalCleanupLabel: "", label: ""},
+		Labels:       map[string]string{globalContainerLabel: "", label: ""},
 		ExposedPorts: exposedPorts,
 	}
 
@@ -432,7 +440,7 @@ func startContainers(cli *client.Client, valConfig config.ValaccountConfig, pool
 		Name:       runtimeName,
 		Network:    label,
 		Env:        runtimeEnv,
-		Labels:     map[string]string{globalCleanupLabel: "", label: ""},
+		Labels:     map[string]string{globalContainerLabel: "", label: ""},
 		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
@@ -678,11 +686,12 @@ func validateVersionOrEmpty(s string) error {
 
 var (
 	flagStartValaccount = commoncmd.OptionFlag[config.ValaccountConfig]{
-		Name:             "valaccount",
-		Short:            "v",
-		Usage:            "Name of the valaccount to run",
-		Required:         true,
-		MaxSelectionSize: 10,
+		Name:              "valaccount",
+		Short:             "v",
+		Usage:             "Name of the valaccount to run",
+		Required:          true,
+		MaxSelectionSize:  10,
+		StartInSearchMode: true,
 	}
 	flagStartEnvFile = commoncmd.StringFlag{
 		Name:       "env-file",
@@ -859,7 +868,7 @@ func startCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "start",
 		Short:   "Start data validator",
-		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, config.LoadConfigs, commoncmd.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, utils.CheckUpdateAvailable, config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			kyveClient, err := chain.NewKyveClient(config.GetConfigX(), config.ValaccountConfigs)
 			if err != nil {

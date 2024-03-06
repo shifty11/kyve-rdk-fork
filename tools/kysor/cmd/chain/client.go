@@ -81,17 +81,18 @@ type KyveClient struct {
 }
 
 func NewKyveClient(cfg config.KysorConfig, valaccConfigs []config.ValaccountConfig) (*KyveClient, error) {
-	if cfg.RPC == "" {
-		return nil, fmt.Errorf("rpc address must not be empty")
+	rpc, err := cfg.GetWorkingRPC()
+	if err != nil {
+		return nil, err
 	}
 
-	httpClient, err := libclient.DefaultHTTPClient(cfg.RPC)
+	httpClient, err := libclient.DefaultHTTPClient(rpc)
 	if err != nil {
 		return nil, err
 	}
 
 	httpClient.Timeout = 10 * time.Second
-	rpcClient, err := rpchttp.NewWithClient(cfg.RPC, "/websocket", httpClient)
+	rpcClient, err := rpchttp.NewWithClient(rpc, "/websocket", httpClient)
 	if err != nil {
 		return nil, err
 	}

@@ -42,9 +42,9 @@ commit=$(shell git rev-parse HEAD)
 tag=$(shell git describe --tags --exact-match 2>/dev/null)
 
 ldflags := $(LDFLAGS)
-ldflags += -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Version=$(VERSION) \
-		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Commit=$(commit) \
-		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd.Tag=$(tag)
+ldflags += -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types.Version=$(VERSION) \
+		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types.Commit=$(commit) \
+		  -X github.com/KYVENetwork/kyve-rdk/tools/kysor/cmd/types.Tag=$(tag)
 ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -ldflags '$(ldflags)'

@@ -4,7 +4,7 @@ import { isPoolActive, setupMetrics } from "../../src/methods";
 import { register } from "prom-client";
 import { newTestValidator } from "../mocks/runtime.mock";
 import { genesis_pool } from "../mocks/constants";
-import { PoolStatus } from "../../../types/lcd/kyve/pool/v1beta1/pool";
+import { PoolStatus } from "@kyvejs/types/lcd/kyve/pool/v1beta1/pool";
 
 /*
 

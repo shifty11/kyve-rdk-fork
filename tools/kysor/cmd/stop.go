@@ -65,7 +65,7 @@ func (o StopOption) StringValue() string {
 
 func setStopOptions(cli *client.Client) error {
 	options := make(map[string]commoncmd.Option[StopOption])
-	containers, err := docker.ListContainers(context.Background(), cli, globalCleanupLabel)
+	containers, err := docker.ListContainers(context.Background(), cli, globalContainerLabel)
 	if err != nil {
 		return fmt.Errorf("failed to list containers: %v", err)
 	}
@@ -81,7 +81,7 @@ func setStopOptions(cli *client.Client) error {
 	optionsList := maps.Values(options)
 	if len(optionsList) >= 1 {
 		// Add all option to beginning of the list
-		optionsList = append([]commoncmd.Option[StopOption]{newStopOption("all", globalCleanupLabel)}, optionsList...)
+		optionsList = append([]commoncmd.Option[StopOption]{newStopOption("all", globalContainerLabel)}, optionsList...)
 	}
 	flagStopValaccount.Options = optionsList
 	return nil
@@ -98,7 +98,7 @@ func stopCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "stop",
 		Short:   "Stop the KYVE data validator",
-		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, config.LoadConfigs, commoncmd.SetupInteractiveMode),
+		PreRunE: commoncmd.CombineFuncs(utils.CheckDockerInstalled, utils.CheckUpdateAvailable, config.LoadConfigs, commoncmd.SetupInteractiveMode),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cli, err := client.NewClientWithOpts(client.WithAPIVersionNegotiation())
 			if err != nil {
