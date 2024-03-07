@@ -49,13 +49,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: ${{needs.changeFinder.outputs.projects}}
+#        project: ${{needs.changeFinder.outputs.projects}}
+        project: ${{fromJSON('["tools/kystrap"]')}}
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: tag-release
         with:
-#          path: ${{ matrix.project }}
-          path: tools/kystrap
+          path: ${{ matrix.project }}
           token: ${{ secrets.GITHUB_TOKEN }}
 #          release-type: node
           monorepo-tags: true
