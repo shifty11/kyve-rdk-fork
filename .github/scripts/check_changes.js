@@ -12,7 +12,7 @@ async function has_changes(folder, latest_tag) {
 
   // Check for changes
   const { stdout } = await exec(`git diff "${latest_tag}" "${folder}"`);
-  console.log(stdout.trim());
+  console.log(stdout.trim() !== '' ? 'Changes' : 'No changes');
   return stdout.trim() !== '';
 }
 
