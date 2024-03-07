@@ -36,6 +36,13 @@ jobs:
         id: check-changes
         run: node .github/scripts/check_changes.js
 
+  check-output:
+    runs-on: ubuntu-latest
+    needs: change-finder
+    steps:
+      - name: Print outputs
+        run: echo ${{ needs.change-finder.outputs.projects }}
+
   release-please-release:
     runs-on: ubuntu-latest
     needs: change-finder
