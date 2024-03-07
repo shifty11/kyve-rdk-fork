@@ -52,7 +52,6 @@ export const newTestValidator = (): Validator => {
     nextKey: runtime.nextKey,
   };
   const config: Partial<ProtocolConfig> = {
-    useGrpc: false,
     // @ts-ignore
     channelOverride: new DirectChannel(runtimeServices),
   };
