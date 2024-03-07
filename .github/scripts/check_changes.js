@@ -50,8 +50,8 @@ async function main() {
   for (const project of projects) {
     const latest_tag = await get_latest_tag(project);
     const changes = await has_changes(project, latest_tag.trim());
-    console.log(`Project: ${project}, Has Changes: ${changes}`);
     if (changes) {
+      console.log(`${project} has changes since ${latest_tag}`);
       changed_projects.push(project);
     }
   }
