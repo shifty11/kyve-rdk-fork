@@ -121,10 +121,21 @@ create_and_run_release_script() {
   # Save the release script to a file
   echo -e "$release_script" > release.sh
 
+  currentTag=$(git describe --tags --abbrev=0)
+
+  echo "currentTag: $currentTag"
+
+  out=$(git shortlog --no-merges "$currentTag...HEAD")
+
+  echo "$out"
+
+  exit
+
   # Ask the user what to do
   printf "\n⚠️  If you want to change the versions, edit the release.sh file before continuing.\n"
   read -p "Do you want to continue? (y/N)" -r response
   printf "\n"
+
   if [[ $response =~ ^[Yy]$ ]]; then
     chmod +x release.sh
     ./release.sh
