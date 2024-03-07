@@ -56,7 +56,7 @@ async function main() {
     }
   }
   const paths = Array.from(changed_projects);
-  console.log(`::set-output name=projects::${JSON.stringify(JSON.stringify(paths))}`);
+  console.log(`::set-output name=projects::${JSON.stringify(paths)}`);
 }
 
 main().catch(console.error);

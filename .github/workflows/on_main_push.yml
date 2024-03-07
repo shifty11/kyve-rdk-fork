@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: ${{fromJson(needs.changeFinder.outputs.projects)}}
+        project: ${{needs.changeFinder.outputs.projects}}
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: tag-release
