@@ -15,11 +15,12 @@ jobs:
   check_changes:
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository
+      # Checkout the repository including all tags
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          ref: 'main'
+          fetch-depth: 0
+          ref: main
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
