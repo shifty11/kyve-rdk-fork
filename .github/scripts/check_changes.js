@@ -46,6 +46,7 @@ async function get_latest_tag(branch_name) {
 }
 
 async function main() {
+  console.log('Checking for changes...');
   const projects = list_projects();
   for (const project of projects) {
     const latest_tag = await get_latest_tag(project);
