@@ -12,14 +12,7 @@ async function has_changes(folder, latest_tag) {
 
   // Check for changes
   const { stdout } = await exec(`git diff "${latest_tag}" "${folder}"`);
-  console.log(stdout.trim() !== '' ? 'Changes' : 'No changes');
   return stdout.trim() !== '';
-}
-
-async function get_changes(folder, latest_tag) {
-  if (!latest_tag) {
-    return true;
-  }
 }
 
 function list_projects() {
@@ -52,14 +45,18 @@ async function get_latest_tag(branch_name) {
 }
 
 async function main() {
-  console.log('Checking for changes...');
   const projects = list_projects();
+  const changed_projects = [];
   for (const project of projects) {
     const latest_tag = await get_latest_tag(project);
-    console.log(`Latest tag for ${project}: ${latest_tag}`);
     const changes = await has_changes(project, latest_tag.trim());
     console.log(`Project: ${project}, Has Changes: ${changes}`);
+    if (changes) {
+      changed_projects.push(project);
+    }
   }
+  const paths = Array.from(changed_projects);
+  console.log(`::set-output name=projects::${JSON.stringify(paths)}`);
 }
 
 main().catch(console.error);
