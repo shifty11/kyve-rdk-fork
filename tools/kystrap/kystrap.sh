@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Set RUNTIME_DIR
-RUNTIME_DIR=./runtime
+RUNTIME_DIR=${PWD}/runtime
 
 # Go up until the root of the project (max 2 levels)
 for _ in $(seq 1 2); do
