@@ -16,6 +16,12 @@ async function has_changes(folder, latest_tag) {
   return stdout.trim() !== '';
 }
 
+async function get_changes(folder, latest_tag) {
+  if (!latest_tag) {
+    return true;
+  }
+}
+
 function list_projects() {
   const listFolders = (dir) => fs.readdirSync(dir, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
@@ -50,6 +56,7 @@ async function main() {
   const projects = list_projects();
   for (const project of projects) {
     const latest_tag = await get_latest_tag(project);
+    console.log(`Latest tag for ${project}: ${latest_tag}`);
     const changes = await has_changes(project, latest_tag.trim());
     console.log(`Project: ${project}, Has Changes: ${changes}`);
   }
