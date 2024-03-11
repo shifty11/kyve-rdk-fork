@@ -36,27 +36,44 @@ jobs:
         id: check-changes
         run: node .github/scripts/check_changes.js
 
-  check-output:
+#  check-output:
+#    runs-on: ubuntu-latest
+#    needs: change-finder
+#    steps:
+#      - name: Print outputs
+#        run: echo ${{ needs.change-finder.outputs.projects }}
+
+  project-finder:
     runs-on: ubuntu-latest
-    needs: change-finder
+    outputs:
+      projects: ${{ steps.check-changes.outputs.projects }}
     steps:
-      - name: Print outputs
-        run: echo ${{ needs.change-finder.outputs.projects }}
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # List all projects in common, protocol, runtime, and tools (excluding common/proto)
+      - name: List projects
+        id: list-projects
+        run: |
+         echo "::set-output name=projects::$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')"
 
   release-please-release:
     runs-on: ubuntu-latest
 #    needs: change-finder
+    needs: project-finder
     strategy:
       fail-fast: false
       matrix:
-#        project: ${{needs.changeFinder.outputs.projects}}
-        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
+        project: ${{needs.changeFinder.outputs.projects}}
+#        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: tag-release
         with:
           path: ${{ matrix.project }}
-          monorepo-tags: true
           release-type: simple
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          release-type: node
