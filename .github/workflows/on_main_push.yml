@@ -7,72 +7,18 @@ on:
       - '*'
 
 jobs:
-  #  releases:
-  #    uses: ./.github/workflows/releases.yml
-  #  release-please:
-  #    uses: ./.github/workflows/release-please.yml
-  project-finder:
+  release-please:
     runs-on: ubuntu-latest
-    outputs:
-      projects: ${{ steps.set-env.outputs.projects }}
     steps:
-      # Checkout the repository
-      - name: Checkout the repository
-        uses: actions/checkout@main
-        with:
-          ref: main
-      # List all projects in common, protocol, runtime, and tools (excluding common/proto)
-      - name: List projects
-        id: list-projects
-        run: |
-          projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
-          echo "PROJECTS=$(echo $projects | jq -R -s -c 'split(" ")')" >> $GITHUB_ENV
-      # Output projects
-      - name: Output projects
-        id: output-projects
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const { PROJECTS } = process.env
-            console.log(PROJECTS)
-            const result = JSON.stringify(PROJECTS)
-            console.log(result)
-            return result
-          result-encoding: string
-      # Print projects
-      - name: Print projects
-        run: |
-          echo ${{ steps.output-projects.outputs.result }}
-      # Set env
-      - name: Set env
-        id: set-env
-        run: echo "::set-output name=projects::${{steps.output-projects.outputs.result}}"
-
-  release-please-release:
-    runs-on: ubuntu-latest
-    #    needs: change-finder
-    needs: project-finder
-    strategy:
-      fail-fast: false
-      matrix:
-        project: ${{ fromJson(needs.project-finder.outputs.projects) }}
-    #        project: ${{ fromJson(needs.project-finder.outputs.projects) }}
-    #        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
-    steps:
-      # Get release type (if it has a package.json, it will be a node release)
-#      - name: Get release type
-#        id: get-release-type
-#        run: |
-#          if [ -f ${{ matrix.project }}/package.json ]; then
-#            echo "RELEASE_TYPE=node"
-#          else
-#            echo "RELEASE_TYPE=simple"
-#          fi
       - uses: google-github-actions/release-please-action@v4
-        id: tag-release
-        with:
-          path: ${{ matrix.project }}
-          release-type: simple
+        #        id: tag-release
+#        with:
+          #          path: ${{ matrix.project }}
+#          release-type: node
+#          extra-files: |
+#            protocol/core/package.json
+
+
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          release-type: node
 #          monorepo-tags: true
