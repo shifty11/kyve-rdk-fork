@@ -5,7 +5,7 @@ on:
 
 jobs:
   release-please:
-    uses: ./.github/workflows/release-please.yml
+    uses: ./.github/workflows/releases_release-please.yml
 
   release-go:
     needs: release-please

@@ -11,13 +11,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      # Here's how you can use the secret
-      - name: Use the secret in the workflow
-        env:
-          RDK_ACTION: ${{ secrets.RDK_ACTION }}
-        run: |
-          echo "Secret value is $RDK_ACTION"
       - uses: google-github-actions/release-please-action@v4
         with:
           include-component-in-tag: true
-          token: ${{ secrets.RDK_ACTION }}
+          token: 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
