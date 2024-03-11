@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/v1.0.0...v1.1.0) (2024-03-11)
+
+
+### Features
+
+* new stuff ([097cd53](https://github.com/shifty11/kyve-rdk-fork/commit/097cd53e39c91dc3072281d13fde4a807c84c5da))
+
 ## [1.3.1](https://github.com/KYVENetwork/kyvejs/compare/@kyve/kysor@1.3.0...@kyve/kysor@1.3.1) (2024-01-26)
 
 **Note:** Version bump only for package @kyve/kysor
