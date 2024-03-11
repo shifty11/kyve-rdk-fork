@@ -86,7 +86,9 @@ jobs:
           script: |
             const { PROJECTS } = process.env
             console.log(PROJECTS)
-            return JSON.stringify(JSON.stringify(PROJECTS))
+            const result = JSON.stringify(PROJECTS)
+            console.log(result)
+            return result
           result-encoding: string
       # Print projects
       - name: Print projects
