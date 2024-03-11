@@ -1010,3 +1010,5 @@ func startCmd() *cobra.Command {
 func init() {
 	rootCmd.AddCommand(startCmd())
 }
+
+// TODO: add random change
