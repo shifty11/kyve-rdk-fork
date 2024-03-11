@@ -43,6 +43,25 @@ jobs:
 #      - name: Print outputs
 #        run: echo ${{ needs.change-finder.outputs.projects }}
 
+#  project-finder:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      projects: ${{ steps.check-changes.outputs.projects }}
+#    steps:
+#      # Checkout the repository
+#      - name: Checkout the repository
+#        uses: actions/checkout@v4
+#        with:
+#          ref: main
+#
+#      # List all projects in common, protocol, runtime, and tools (excluding common/proto)
+#      - name: List projects
+#        id: list-projects
+#        run: |
+#          projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
+#          projects_json=toJSON($projects)
+#          echo "::set-output name=projects::$projects_json"
+
   project-finder:
     runs-on: ubuntu-latest
     outputs:
@@ -50,17 +69,29 @@ jobs:
     steps:
       # Checkout the repository
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
         with:
           ref: main
-
       # List all projects in common, protocol, runtime, and tools (excluding common/proto)
       - name: List projects
         id: list-projects
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const projects = JSON.stringify(JSON.stringify(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto'))
+            console.log(projects)
+            
+            return JSON.stringify(JSON.stringify(projects))
+          result-encoding: string
+      # Print projects
+      - name: Print projects
         run: |
-          projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
-          projects_json=toJSON($projects)
-          echo "::set-output name=projects::$projects_json"
+          echo ${{ steps.list-projects.outputs.result }}
+      # Set tags
+      - name: Set tags
+        id: set-env
+        run: echo "::set-output name=projects::${{steps.list-projects.outputs.result}}"
+
 
   print-projects:
     runs-on: ubuntu-latest
