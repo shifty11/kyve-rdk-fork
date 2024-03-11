@@ -18,8 +18,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+      # Set working directory
       - name: Set working directory
         run: echo 'WORKING_DIR="tools/kysor"' >> $GITHUB_ENV
+      # Print .release-please-manifest.json
+      - name: Print .release-please-manifest.json
+        run: cat .release-please-manifest.json
       # Set version
       - name: Set version
         run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.[\"tools/kysor\"]'" >> $GITHUB_ENV
