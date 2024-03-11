@@ -26,8 +26,8 @@ jobs:
         run: cat .release-please-manifest.json | jq -r '.["tools/kysor"]'
       # Get kysor version and save it to an environment variable
       - name: Get kysor version
-        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.[\"tools/kysor\"]')" >> $GITHUB_ENV
-      # Setup Golang from woring directory
+        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["tools/kysor"]')" >> $GITHUB_ENV
+      # Setup Golang from working directory
       - name: 🐿 Setup Golang
         uses: actions/setup-go@v4
         with:
