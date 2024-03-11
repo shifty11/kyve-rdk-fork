@@ -99,14 +99,6 @@ jobs:
         id: set-env
         run: echo "::set-output name=projects::${{steps.output-projects.outputs.result}}"
 
-
-  print-projects:
-    runs-on: ubuntu-latest
-    needs: project-finder
-    steps:
-      - name: Print projects
-        run: echo ${{ fromJson(needs.project-finder.outputs.projects) }}
-
   release-please-release:
     runs-on: ubuntu-latest
 #    needs: change-finder
