@@ -39,7 +39,8 @@ jobs:
             
             const selectedTags = tags.filter(it => {
               const regex = /^[\w\/]+-v\d+\.\d+\.\d+$/;
-              return regex.test(it);
+              const module = it.split('-v')[0];
+              return regex.test(it) && modules.includes(module);
             });
 
             console.log(selectedTags)
