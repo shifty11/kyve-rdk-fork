@@ -59,7 +59,7 @@ jobs:
         id: list-projects
         run: |
           projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
-          projects_json=$(echo $projects | jq -R -s -c 'split(" ")')
+          projects_json=$(echo $projects | jq -R -s -c 'split(" ") | map("\"" + . + "\"") | "[" + join(",") + "]"' | cat)
           echo "::set-output name=projects::$projects_json"
 
   print-projects:
@@ -67,7 +67,7 @@ jobs:
     needs: project-finder
     steps:
       - name: Print projects
-        run: echo ${{fromJson(needs.project-finder.outputs.projects)}}
+        run: echo ${{ fromJson(needs.project-finder.outputs.projects) }}
 
   release-please-release:
     runs-on: ubuntu-latest
@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: ${{fromJson(needs.project-finder.outputs.projects)}}
+        project: ${{ fromJson(needs.project-finder.outputs.projects) }}
 #        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
     steps:
       - uses: google-github-actions/release-please-action@v4
