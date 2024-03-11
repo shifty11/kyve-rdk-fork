@@ -65,7 +65,7 @@ jobs:
   project-finder:
     runs-on: ubuntu-latest
     outputs:
-      output-tags: ${{ steps.set-env.outputs.projects }}
+      projects: ${{ steps.set-env.outputs.projects }}
     steps:
       # Checkout the repository
       - name: Checkout the repository
@@ -94,8 +94,8 @@ jobs:
       - name: Print projects
         run: |
           echo ${{ steps.output-projects.outputs.result }}
-      # Set tags
-      - name: Set tags
+      # Set env
+      - name: Set env
         id: set-env
         run: echo "::set-output name=projects::${{steps.output-projects.outputs.result}}"
 
