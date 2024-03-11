@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.2](https://github.com/shifty11/kyve-rdk-fork/compare/protocol/core-v1.3.1...protocol/core@1.3.2) (2024-03-11)
+
+
+### Bug Fixes
+
+* some stuff ([fa36901](https://github.com/shifty11/kyve-rdk-fork/commit/fa3690198190ce046349247f98812f83825e8d44))
+
 ## [1.3.1](https://github.com/shifty11/kyve-rdk-fork/compare/protocol/core-v1.3.0...protocol/core-v1.3.1) (2024-03-11)
 
 
