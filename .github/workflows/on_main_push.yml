@@ -1,8 +1,10 @@
 name: On main push
 
+#on:
+#  push:
+#    branches: [ main ]
 on:
-  push:
-    branches: [ main ]
+  workflow_call:
 
 jobs:
   release-please:
@@ -11,34 +13,3 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           include-component-in-tag: true
-        #        id: tag-release
-#        with:
-          #          path: ${{ matrix.project }}
-#          release-type: node
-#          extra-files: |
-#            protocol/core/package.json
-
-
-#          token: ${{ secrets.GITHUB_TOKEN }}
-#          release-type: node
-#          monorepo-tags: true
-#          package-name: ${{ matrix.package }}
-#          command: github-release
-#      - uses: actions/checkout@v4
-#        if: ${{ steps.tag-release.outputs.releases_created }}
-#      - uses: pnpm/action-setup@v2
-#        with:
-#          version: 8
-#      - uses: actions/setup-node@v3
-#        if: ${{ steps.tag-release.outputs.releases_created }}
-#        with:
-#          node-version: 16
-#          registry-url: 'https://external-dot-oss-automation.appspot.com/'
-#          cache: 'pnpm'
-#      - name: publish
-#        if: ${{ steps.tag-release.outputs.releases_created }}
-#        env:
-#          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-#        run: |
-#          pnpm install
-#          pnpm publish --filter ${{ matrix.package }} --no-git-checks --access public
