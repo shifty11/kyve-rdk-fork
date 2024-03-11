@@ -16,9 +16,9 @@ jobs:
 #          path: ${{ matrix.project }}
           release-type: node
           extra-files: |
-            common/goutils/go.mod
+#            common/goutils/go.mod
             protocol/core/package.json
-            tools/kystrap/go.mod
+#            tools/kystrap/go.mod
             
 
 #          token: ${{ secrets.GITHUB_TOKEN }}
