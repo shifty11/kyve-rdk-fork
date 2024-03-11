@@ -2,6 +2,5 @@
   "packages": {
     "protocol/core": {},
     "runtime/tendermint": {},
-    "tools/kysor": {}
   }
 }
