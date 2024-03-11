@@ -2,8 +2,8 @@
   "packages": {
     "protocol/core": {},
     "runtime/tendermint": {},
-    "tools/kysort": {
-      "release_type": "go"
+    "tools/kysor": {
+      "release-type": "go"
     }
   }
 }
