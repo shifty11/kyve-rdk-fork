@@ -15,9 +15,9 @@ jobs:
         with:
 #          path: ${{ matrix.project }}
           release-type: node
-          extra-files: |
-            protocol/core/package.json
-            
+#          extra-files: |
+#            protocol/core/package.json
+
 
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          release-type: node
