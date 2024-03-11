@@ -3,14 +3,14 @@ name: On main push
 on:
   push:
     branches: [ main ]
-    tags:
-      - '*'
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4
+        with:
+          include-component-in-tag: true
         #        id: tag-release
 #        with:
           #          path: ${{ matrix.project }}
