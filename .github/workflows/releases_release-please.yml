@@ -14,4 +14,4 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           include-component-in-tag: true
-          token: "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"
+          token: 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
