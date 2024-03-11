@@ -69,7 +69,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: ${{needs.changeFinder.outputs.projects}}
+        project: ${{fromJson(needs.project-finder.outputs.projects)}}
 #        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
     steps:
       - uses: google-github-actions/release-please-action@v4
