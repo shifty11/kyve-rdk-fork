@@ -1,4 +1,5 @@
 {
+  "commit-search-depth": 10,
   "packages": {
     "common/goutils": {
       "release-type": "go",
