@@ -27,7 +27,7 @@
     "tools/kysor": {
       "release-type": "go",
       "package-name": "tools/kysor",
-      "separate-pull-request": true
+      "separate-pull-requests": true
     },
     "tools/kystrap": {
       "release-type": "go",
