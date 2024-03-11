@@ -93,11 +93,11 @@ jobs:
       # Print projects
       - name: Print projects
         run: |
-          echo ${{ steps.list-projects.outputs.result }}
+          echo ${{ steps.output-projects.outputs.result }}
       # Set tags
       - name: Set tags
         id: set-env
-        run: echo "::set-output name=projects::${{steps.list-projects.outputs.result}}"
+        run: echo "::set-output name=projects::${{steps.output-projects.outputs.result}}"
 
 
   print-projects:
