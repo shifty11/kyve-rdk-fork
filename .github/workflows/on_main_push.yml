@@ -50,7 +50,7 @@ jobs:
       fail-fast: false
       matrix:
 #        project: ${{needs.changeFinder.outputs.projects}}
-        project: ${{fromJSON('["tools/kystrap"]')}}
+        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: tag-release
