@@ -12,29 +12,29 @@ jobs:
 #  release-please:
 #    uses: ./.github/workflows/release-please.yml
 
-  change-finder:
-    runs-on: ubuntu-latest
-    outputs:
-      projects: ${{ steps.check-changes.outputs.projects }}
-    steps:
-      # Checkout the repository including all tags
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          ref: main
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-#      - name: Install dependencies
-#        run: npm ci
-
-      - name: Check changes
-        id: check-changes
-        run: node .github/scripts/check_changes.js
+#  change-finder:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      projects: ${{ steps.check-changes.outputs.projects }}
+#    steps:
+#      # Checkout the repository including all tags
+#      - name: Checkout the repository
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          ref: main
+#
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 20
+#
+##      - name: Install dependencies
+##        run: npm ci
+#
+#      - name: Check changes
+#        id: check-changes
+#        run: node .github/scripts/check_changes.js
 
 #  check-output:
 #    runs-on: ubuntu-latest
@@ -58,7 +58,9 @@ jobs:
       - name: List projects
         id: list-projects
         run: |
-         echo "::set-output name=projects::$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')"
+          projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
+          projects_json=$(echo $projects | jq -R -s -c 'split(" ")')
+          echo "::set-output name=projects::$projects_json"
 
   release-please-release:
     runs-on: ubuntu-latest
