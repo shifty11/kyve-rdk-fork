@@ -1,5 +1,7 @@
 {
   "packages": {
-    "protocol/core": {}
+    "protocol/core": {},
+    "runtime/tendermint": {},
+    "tools/kysor": {}
   }
 }
