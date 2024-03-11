@@ -84,7 +84,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const { PROJECTS } = process
+            const { PROJECTS } = process.env
             console.log(PROJECTS)
             return JSON.stringify(JSON.stringify(PROJECTS))
           result-encoding: string
