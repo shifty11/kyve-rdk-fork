@@ -9,7 +9,7 @@ on:
 
 jobs:
   run_if:
-    if: startsWith(github.head_ref, 'release-please--branches--main--components--tools/kysor')
+#    if: startsWith(github.head_ref, 'release-please--branches--main--components--tools/kysor')
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
