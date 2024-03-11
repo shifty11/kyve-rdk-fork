@@ -1,17 +1,32 @@
 {
   "packages": {
     "common/goutils": {
-      "release-type": "go"
+      "release-type": "go",
+      "package-name": "common/goutils"
     },
-    "protocol/core": {},
-    "runtime/tendermint": {},
-    "runtime/tendermint-bsync": {},
-    "runtime/tendermint-ssync": {},
+    "protocol/core": {
+      "release-type": "node",
+      "package-name": "protocol/core"
+    },
+    "runtime/tendermint": {
+      "release-type": "node",
+      "package-name": "runtime/tendermint"
+    },
+    "runtime/tendermint-bsync": {
+      "release-type": "node",
+      "package-name": "runtime/tendermint-bsync"
+    },
+    "runtime/tendermint-ssync": {
+      "release-type": "node",
+      "package-name": "runtime/tendermint-ssync"
+    },
     "tools/kysor": {
-      "release-type": "go"
+      "release-type": "go",
+      "package-name": "tools/kysor"
     },
     "tools/kystrap": {
-      "release-type": "go"
+      "release-type": "go",
+      "package-name": "tools/kystrap"
     }
   }
 }
