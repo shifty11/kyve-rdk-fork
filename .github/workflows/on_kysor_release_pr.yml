@@ -61,7 +61,16 @@ jobs:
         run: cat RELEASE_BODY.md
       # Create new tag
       - name: Create new tag
-        run: git tag -a tools/kysor@${{ env.VERSION }} -m "Release ${{ env.VERSION }}"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {VERSION} = process.env          
+            github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/tools/kysor@${DIST_VERSION}`,
+                sha: context.sha
+            })
       # Publish the Release
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
