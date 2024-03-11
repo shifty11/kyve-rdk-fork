@@ -80,8 +80,7 @@ jobs:
           script: |
             const projects = JSON.stringify(JSON.stringify(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto'))
             console.log(projects)
-            
-            return JSON.stringify(JSON.stringify(projects))
+            return projects
           result-encoding: string
       # Print projects
       - name: Print projects
