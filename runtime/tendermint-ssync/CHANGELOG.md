@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 1.0.0 (2024-03-11)
+
+
+### Features
+
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* e2e tests ([43542ce](https://github.com/shifty11/kyve-rdk-fork/commit/43542ce41082dfa87853e831ef76f2bfd9cef057))
+* typescript issues that broke the tests ([083aed8](https://github.com/shifty11/kyve-rdk-fork/commit/083aed882b8c497314ca5f0fa10026f471c6dac6))
+
 ## [1.1.4](https://github.com/KYVENetwork/kyvejs/compare/@kyvejs/tendermint-ssync@1.1.3...@kyvejs/tendermint-ssync@1.1.4) (2024-01-26)
 
 **Note:** Version bump only for package @kyvejs/tendermint-ssync
