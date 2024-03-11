@@ -1,8 +1,16 @@
 {
   "packages": {
+    "common/goutils": {
+      "release-type": "go"
+    },
     "protocol/core": {},
     "runtime/tendermint": {},
+    "runtime/tendermint-bsync": {},
+    "runtime/tendermint-ssync": {},
     "tools/kysor": {
+      "release-type": "go"
+    },
+    "tools/kystrap": {
       "release-type": "go"
     }
   }
