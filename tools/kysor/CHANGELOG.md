@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [6.0.2](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor@6.0.1...tools/kysor@6.0.2) (2024-03-11)
+
+
+### Bug Fixes
+
+* some stuff ([da35204](https://github.com/shifty11/kyve-rdk-fork/commit/da352049a468450bae5c86811faf335e6c792769))
+* some stuff ([cb738c5](https://github.com/shifty11/kyve-rdk-fork/commit/cb738c5bc8233a3c0b7cf13f653cfc574a51af6a))
+* some stuff ([926ad0a](https://github.com/shifty11/kyve-rdk-fork/commit/926ad0ab7615530a4ff11c392602766893c51ab2))
+
 ## [6.0.1](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor-v6.0.0...tools/kysor@6.0.1) (2024-03-11)
 
 
