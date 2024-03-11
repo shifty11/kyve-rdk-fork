@@ -37,7 +37,10 @@ jobs:
             const modules = JSON.parse(JSON.parse(MODULES))
             const tags = JSON.parse(JSON.parse(TAGS))
             
-            const selectedTags = tags.filter(it => modules.includes(it.split('@')[0]))
+            const selectedTags = tags.filter(it => {
+              const regex = /^[\w\/]+-v\d+\.\d+\.\d+$/;
+              return regex.test(it);
+            });
 
             console.log(selectedTags)
             return JSON.stringify(JSON.stringify(selectedTags))

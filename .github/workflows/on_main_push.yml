@@ -5,9 +5,5 @@ on:
     branches: [ main ]
 
 jobs:
-  release-please:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: google-github-actions/release-please-action@v4
-        with:
-          include-component-in-tag: true
+  releases:
+    uses: ./.github/workflows/releases.yml

@@ -22,7 +22,8 @@
     },
     "tools/kysor": {
       "release-type": "go",
-      "package-name": "tools/kysor"
+      "package-name": "tools/kysor",
+      "skip-github-release": true
     },
     "tools/kystrap": {
       "release-type": "go",
