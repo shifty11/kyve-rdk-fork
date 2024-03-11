@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.0](https://github.com/shifty11/kyve-rdk-fork/compare/protocol/core-v1.2.0...protocol/core-v1.3.0) (2024-03-11)
+
+
+### Features
+
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* add direct-channel again (as test file) ([c0fef82](https://github.com/shifty11/kyve-rdk-fork/commit/c0fef821869e7afa857a3ddc34d4e32383921a86))
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* expose metrics port ([9a9e16a](https://github.com/shifty11/kyve-rdk-fork/commit/9a9e16a709789a984dbdd3c5908ebfe5f6420e92))
+* the bug ([023e034](https://github.com/shifty11/kyve-rdk-fork/commit/023e034d0ccf82c95960f2139b21fd7759081ee9))
+
 ## [1.2.0](https://github.com/shifty11/kyve-rdk-fork/compare/protocol-v1.1.4...protocol-v1.2.0) (2024-03-11)
 
 
