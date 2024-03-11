@@ -18,9 +18,11 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+      - name: Set working directory
+        run: echo 'WORKING_DIR="tools/kysor"' >> $GITHUB_ENV
       # Set version
       - name: Set version
-        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["tools/kysor"]'" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.[\"tools/kysor\"]'" >> $GITHUB_ENV
       # Setup Golang from woring directory
       - name: 🐿 Setup Golang
         uses: actions/setup-go@v4
@@ -35,13 +37,13 @@ jobs:
           VERSION: ${{ env.VERSION }}
       # Generate Release Body
       - name: Generate Release Body
-        run: npx extract-changelog-release  ${{ github.workspace }}/tools/kysor/CHANGELOG.md > RELEASE_BODY.md
+        run: npx extract-changelog-release  ${{ github.workspace }}/${{env.WORKING_DIR}}/CHANGELOG.md > RELEASE_BODY.md
       # Publish the Release
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
         with:
           body_path: RELEASE_BODY.md
-          files: tools/kysor/release/*
+          files: ${{ env.WORKING_DIR }}/release/*
           tag_name: ${{ matrix.tag }}
           prerelease: false
         env:
