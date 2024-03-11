@@ -1,6 +1,6 @@
 {
   "packages": {
     "protocol/core": {},
-    "runtime/tendermint": {},
+    "runtime/tendermint": {}
   }
 }
