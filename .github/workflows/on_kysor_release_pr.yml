@@ -15,7 +15,7 @@ on:
 
 
 jobs:
-  run_if:
+  on_kysor_release_pr_closed:
 #    Run only if the closed pull request is on the main branch and starts with 'release-please--branches--main--components--tools/kysor'
     if : |
       github.event_name == 'pull_request' &&
@@ -23,14 +23,15 @@ jobs:
       github.event.pull_request.base.ref == 'main' &&
       startsWith(github.event.pull_request.head.ref, 'release-please--branches--main--components--tools/kysor')
 #    if: startsWith(github.head_ref, 'release-please--branches--main--components--tools/kysor')
-    name: "On Kysor release PR"
+    name: "Release Kysor"
     runs-on: ubuntu-latest
     steps:
       # Checkout the repository
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+#          ref: ${{ github.head_ref }}
+          ref: main
       # Set working directory
       - name: Set working directory
         run: echo 'WORKING_DIR=tools/kysor' >> $GITHUB_ENV
@@ -58,6 +59,9 @@ jobs:
       # Print release body
       - name: Print release body
         run: cat RELEASE_BODY.md
+      # Create new tag
+      - name: Create new tag
+        run: git tag -a tools/kysor@${{ env.VERSION }} -m "Release ${{ env.VERSION }}"
       # Publish the Release
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
