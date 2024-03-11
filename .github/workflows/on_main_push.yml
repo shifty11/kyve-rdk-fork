@@ -76,7 +76,8 @@ jobs:
       - name: List projects
         id: list-projects
         run: |
-          echo "PROJECTS=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')" >> $GITHUB_ENV
+          projects=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')
+          echo "PROJECTS=$(echo $projects | jq -R -s -c 'split(" ")')" >> $GITHUB_ENV
       # Output projects
       - name: Output projects
         id: output-projects
