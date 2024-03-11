@@ -8,4 +8,5 @@ jobs:
     uses: ./.github/workflows/release-please.yml
 
   release-go:
+    needs: release-please
     uses: ./.github/workflows/releases_go.yml
