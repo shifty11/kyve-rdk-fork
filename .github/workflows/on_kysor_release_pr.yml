@@ -20,7 +20,7 @@ jobs:
           ref: ${{ github.head_ref }}
       # Set working directory
       - name: Set working directory
-        run: echo 'WORKING_DIR="tools/kysor"' >> $GITHUB_ENV
+        run: echo 'WORKING_DIR=tools/kysor' >> $GITHUB_ENV
       # Print .release-please-manifest.json
       - name: Print .release-please-manifest.json
         run: cat .release-please-manifest.json | jq -r '.["tools/kysor"]'
