@@ -65,7 +65,7 @@ jobs:
   project-finder:
     runs-on: ubuntu-latest
     outputs:
-      projects: ${{ steps.check-changes.outputs.projects }}
+      output-tags: ${{ steps.set-env.outputs.projects }}
     steps:
       # Checkout the repository
       - name: Checkout the repository
