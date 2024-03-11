@@ -15,7 +15,7 @@ permissions:
 jobs:
   release-please:
     # Do not run if the push was from a kysor PR
-    if: !startsWith(github.event.pull_request.head.ref, 'release-please--branches--main--components--tools/kysor')
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release-please--branches--main--components--tools/kysor') }}
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4
