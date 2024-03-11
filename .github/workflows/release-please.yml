@@ -14,3 +14,4 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         with:
           include-component-in-tag: true
+          token: ${{ secrets.RDK_ACTION }}

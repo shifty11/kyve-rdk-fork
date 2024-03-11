@@ -1,5 +1,6 @@
 {
   "commit-search-depth": 10,
+  "include-component-in-tag": true,
   "tag-separator": "@",
   "include-v-in-tag": false,
   "packages": {
