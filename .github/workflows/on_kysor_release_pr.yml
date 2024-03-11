@@ -23,7 +23,7 @@ jobs:
         run: echo 'WORKING_DIR="tools/kysor"' >> $GITHUB_ENV
       # Print .release-please-manifest.json
       - name: Print .release-please-manifest.json
-        run: cat .release-please-manifest.json | jq -r '.[\"tools/kysor\"]'
+        run: cat .release-please-manifest.json | jq -r '.["tools/kysor"]'
       # Set version
       - name: Set version
         run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.[\"tools/kysor\"]'" >> $GITHUB_ENV
