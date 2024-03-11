@@ -75,12 +75,17 @@ jobs:
       # List all projects in common, protocol, runtime, and tools (excluding common/proto)
       - name: List projects
         id: list-projects
+        run: |
+          echo "PROJECTS=$(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto')" >> $GITHUB_ENV
+      # Output projects
+      - name: Output projects
+        id: output-projects
         uses: actions/github-script@v7
         with:
           script: |
-            const projects = JSON.stringify(JSON.stringify(ls -d common/* protocol/* runtime/* tools/* | grep -v 'common/proto'))
-            console.log(projects)
-            return projects
+            const { PROJECTS } = process
+            console.log(PROJECTS)
+            return JSON.stringify(JSON.stringify(PROJECTS))
           result-encoding: string
       # Print projects
       - name: Print projects
