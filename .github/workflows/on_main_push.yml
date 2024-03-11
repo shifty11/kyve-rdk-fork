@@ -60,19 +60,19 @@ jobs:
     #        project: ${{fromJSON('["tools/kystrap", "tools/kysor", "common/goutils", "protocol/core", "runtime/tendermint", ]')}}
     steps:
       # Get release type (if it has a package.json, it will be a node release)
-      - name: Get release type
-        id: get-release-type
-        run: |
-          if [ -f ${{ matrix.project }}/package.json ]; then
-            echo "RELEASE_TYPE=node"
-          else
-            echo "RELEASE_TYPE=simple"
-          fi
+#      - name: Get release type
+#        id: get-release-type
+#        run: |
+#          if [ -f ${{ matrix.project }}/package.json ]; then
+#            echo "RELEASE_TYPE=node"
+#          else
+#            echo "RELEASE_TYPE=simple"
+#          fi
       - uses: google-github-actions/release-please-action@v4
         id: tag-release
         with:
           path: ${{ matrix.project }}
-          release-type: ${{ steps.get-release-type.outputs.RELEASE_TYPE }}
+          release-type: simple
 #          token: ${{ secrets.GITHUB_TOKEN }}
 #          release-type: node
 #          monorepo-tags: true
