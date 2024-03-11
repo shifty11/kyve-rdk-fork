@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor-v4.0.0...tools/kysor-v5.0.0) (2024-03-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* KYSOR bug!!!
+
+### Bug Fixes
+
+* KYSOR bug!!! ([2f7101c](https://github.com/shifty11/kyve-rdk-fork/commit/2f7101cf735793390164d32220c36eb4c5bbfd4f))
+
 ## [4.0.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor-v3.0.0...tools/kysor-v4.0.0) (2024-03-11)
 
 
