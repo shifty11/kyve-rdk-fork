@@ -1,7 +1,11 @@
 name: On pull request
 
+#on:
+#  - pull_request
 on:
-  - pull_request
+  push:
+    branches: [ main ]
+
 
 jobs:
   run_if:
@@ -15,7 +19,7 @@ jobs:
           ref: ${{ github.head_ref }}
       # Set working directory
       - name: Set working directory
-        run: echo "WORKING_DIR=tools/kysor >> $GITHUB_ENV
+        run: echo "WORKING_DIR='tools/kysor' >> $GITHUB_ENV
       # Set version
       - name: Set version
         run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["tools/kysor"]'" >> $GITHUB_ENV
@@ -31,8 +35,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIR }}
         env:
           VERSION: ${{ env.VERSION }}
-        # TODO: Generate release body
-            # Generate Release Body
+      # Generate Release Body
       - name: Generate Release Body
         run: npx extract-changelog-release  ${{ github.workspace }}/${{env.WORKING_DIR}}/CHANGELOG.md > RELEASE_BODY.md
       # Publish the Release
