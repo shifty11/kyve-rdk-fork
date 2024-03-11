@@ -3,7 +3,7 @@
     "protocol/core": {},
     "runtime/tendermint": {},
     "tools/kysort": {
-      "type": "go"
+      "release_type": "go"
     }
   }
 }
