@@ -8,5 +8,40 @@ jobs:
     if: startsWith(github.head_ref, 'release-please--branches--main--components--tools/kysor')
     runs-on: ubuntu-latest
     steps:
-      - name: Print PR title
-        run: echo "PR title is ${{ github.event.pull_request.title }}"
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      # Set working directory
+      - name: Set working directory
+        run: echo "WORKING_DIR=tools/kysor >> $GITHUB_ENV
+      # Set version
+      - name: Set version
+        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["tools/kysor"]'" >> $GITHUB_ENV
+      # Setup Golang from woring directory
+      - name: 🐿 Setup Golang
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: ${{ env.WORKING_DIR }}/go.mod
+          cache-dependency-path: ${{ env.WORKING_DIR }}/go.sum
+      # Build
+      - name: Build
+        run: make release
+        working-directory: ${{ env.WORKING_DIR }}
+        env:
+          VERSION: ${{ env.VERSION }}
+        # TODO: Generate release body
+            # Generate Release Body
+      - name: Generate Release Body
+        run: npx extract-changelog-release  ${{ github.workspace }}/${{env.WORKING_DIR}}/CHANGELOG.md > RELEASE_BODY.md
+      # Publish the Release
+      - name: Publish the Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: RELEASE_BODY.md
+          files: ${{ env.WORKING_DIR }}/release/*
+          tag_name: ${{ matrix.tag }}
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
