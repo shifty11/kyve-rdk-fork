@@ -33,15 +33,18 @@ jobs:
         with:
           go-version-file: ${{ env.WORKING_DIR }}/go.mod
           cache-dependency-path: ${{ env.WORKING_DIR }}/go.sum
-      # Build
-      - name: Build
-        run: make release
-        working-directory: ${{ env.WORKING_DIR }}
-        env:
-          VERSION: ${{ env.VERSION }}
+#      # Build
+#      - name: Build
+#        run: make release
+#        working-directory: ${{ env.WORKING_DIR }}
+#        env:
+#          VERSION: ${{ env.VERSION }}
       # Generate Release Body
       - name: Generate Release Body
         run: npx extract-changelog-release  ${{ github.workspace }}/${{env.WORKING_DIR}}/CHANGELOG.md > RELEASE_BODY.md
+      # Print release body
+      - name: Print release body
+        run: cat RELEASE_BODY.md
       # Publish the Release
       - name: Publish the Release
         uses: softprops/action-gh-release@v1
