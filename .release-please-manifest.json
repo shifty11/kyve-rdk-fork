@@ -1,1 +1,1 @@
-{"protocol/core":"1.2.0","runtime/tendermint":"2.0.0","tools/kysor":"2.0.0","common/goutils":"1.0.0","runtime/tendermint-bsync":"1.0.0","runtime/tendermint-ssync":"1.0.0","tools/kystrap":"1.0.0"}
+{"protocol/core":"1.2.0","runtime/tendermint":"2.0.0","tools/kysor":"3.0.0","common/goutils":"1.1.0","runtime/tendermint-bsync":"1.0.0","runtime/tendermint-ssync":"1.0.0","tools/kystrap":"1.0.1"}
