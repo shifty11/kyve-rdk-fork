@@ -4,9 +4,8 @@ on:
   - pull_request
 
 jobs:
-#   check if the pr name equals "release-please--branches--main--components--tools/kysor"
-  if: github.event_name == 'pull_request' && contains(github.event.pull_request.title, 'release-please--branches--main--components--tools/kysor')
-  print-pr-title:
+  run_if:
+    if: startsWith(github.head_ref, 'release-please--branches--main--components--tools/kysor')
     runs-on: ubuntu-latest
     steps:
       - name: Print PR title
