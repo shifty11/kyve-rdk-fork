@@ -29,10 +29,7 @@ export default class GrpcRuntime implements IRuntime {
       "grpc.max_send_message_length": maxMessageSize,
       "grpc.max_receive_message_length": maxMessageSize,
     };
-    if (!protocolConfig.useGrpc) {
-      if (protocolConfig.channelOverride === undefined) {
-        throw new Error("protocolConfig.channelOverride  is undefined");
-      }
+    if (protocolConfig.channelOverride !== undefined) {
       options.channelOverride = protocolConfig.channelOverride;
     }
     this.grpcClient = new RuntimeServiceClient(

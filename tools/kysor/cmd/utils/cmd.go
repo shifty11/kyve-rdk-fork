@@ -127,7 +127,7 @@ func CheckUpdateAvailable(_ *cobra.Command, _ []string) error {
 	}
 
 	if latestTag != nil {
-		readmeLink := "/tree/main/tools/kysor#installation-update"
+		readmeLink := "/tree/main/tools/kysor#installationupdate"
 		updateLink := types.RepoUrl + readmeLink
 		fmt.Printf("🎉  A new version of KYSOR is available: %s\n    Update guide: %s\n\n", latestTag.Original(), updateLink)
 	}
