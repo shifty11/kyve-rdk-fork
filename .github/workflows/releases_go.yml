@@ -16,8 +16,10 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
-          #          ref: ${{ github.head_ref }}
           ref: main
+      # Install nodejs
+      - name: Install nodejs
+        uses: actions/setup-node@v4
       # Set working dir as env var
       - name: Set working directory
         run: echo "WORKING_DIR=${{ inputs.working-dir }}" >> $GITHUB_ENV

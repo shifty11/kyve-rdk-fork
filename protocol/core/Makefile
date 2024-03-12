@@ -61,4 +61,3 @@ docker-image:
 	@docker build -t $(DOCKER_IMAGE_NAME):$(VERSION) -f $(DOCKERFILE) --build-arg VERSION=$(VERSION) .
 	@echo "✅ Completed Docker image build!"
 
-
