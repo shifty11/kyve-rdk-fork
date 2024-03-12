@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.1](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-bsync@v2.1.0...runtime/tendermint-bsync@2.1.1) (2024-03-12)
+
+
+### Bug Fixes
+
+* some stuff ([44f6b77](https://github.com/shifty11/kyve-rdk-fork/commit/44f6b777eb1587b32a36516c434b5b9de5477d8b))
+
 ## [2.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-bsync-v2.0.0...runtime/tendermint-bsync@v2.1.0) (2024-03-11)
 
 
