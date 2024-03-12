@@ -38,7 +38,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
       # Generate Release Body
       - name: Generate Release Body
-        run: npx extract-changelog-release  ${{ github.workspace }}/$${{ env.WORKING_DIR }}/CHANGELOG.md > RELEASE_BODY.md
+        run: npx extract-changelog-release  ${{ github.workspace }}/${{ env.WORKING_DIR }}/CHANGELOG.md > RELEASE_BODY.md
       # Print release body
       - name: Print release body
         run: cat RELEASE_BODY.md
