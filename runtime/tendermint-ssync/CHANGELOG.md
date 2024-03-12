@@ -3,20 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.1.2](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-ssync-v1.1.1...runtime/tendermint-ssync@1.1.2) (2024-03-12)
-
-
-### Bug Fixes
-
-* fix some things ([f426185](https://github.com/shifty11/kyve-rdk-fork/commit/f426185f009c6101b454049a10c3e14f4d5e2161))
-
-## [1.1.1](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-ssync-v1.1.0...runtime/tendermint-ssync@1.1.1) (2024-03-12)
-
-
-### Bug Fixes
-
-* fix some things ([f426185](https://github.com/shifty11/kyve-rdk-fork/commit/f426185f009c6101b454049a10c3e14f4d5e2161))
-
 ## [1.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-ssync@1.0.0...runtime/tendermint-ssync-v1.1.0) (2024-03-11)
 
 
