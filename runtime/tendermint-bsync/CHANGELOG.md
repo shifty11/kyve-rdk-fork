@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2.0.0 (2024-03-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* change
+
+### Features
+
+* new runtime ([4bd7bad](https://github.com/shifty11/kyve-rdk-fork/commit/4bd7bad2a1627d649bcab6baa48f5af1020d118f))
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* change ([9627a96](https://github.com/shifty11/kyve-rdk-fork/commit/9627a96aba6ad68c25592331bbdf8a5675112172))
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* e2e tests ([43542ce](https://github.com/shifty11/kyve-rdk-fork/commit/43542ce41082dfa87853e831ef76f2bfd9cef057))
+* some stuff ([44f6b77](https://github.com/shifty11/kyve-rdk-fork/commit/44f6b777eb1587b32a36516c434b5b9de5477d8b))
+* typescript issues that broke the tests ([083aed8](https://github.com/shifty11/kyve-rdk-fork/commit/083aed882b8c497314ca5f0fa10026f471c6dac6))
+
 ## [2.1.1](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-bsync@v2.1.0...runtime/tendermint-bsync@2.1.1) (2024-03-12)
 
 
