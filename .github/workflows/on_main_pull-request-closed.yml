@@ -22,7 +22,7 @@ permissions:
 jobs:
   release:
     # Only run if the push was from release-please created PR but not from the tools/kysor branch
-    if: ${{ startsWith(github.event.pull_request.head.ref, 'release-please--branches--main' && !github.event.pull_request.head.ref === 'release-please--branches--main--components--tools/kysor') }}
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release-please--branches--main') && github.event.pull_request.head.ref != 'release-please--branches--main--components--tools/kysor' }}
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4
