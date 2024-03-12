@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap@1.2.0...tools/kystrap@1.3.0) (2024-03-12)
+
+
+### Features
+
+* new feature ([35ae1cc](https://github.com/shifty11/kyve-rdk-fork/commit/35ae1cca376b8bbd9e19962b9f2ea5ed6774468d))
+
 ## [1.2.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap@1.1.4...tools/kystrap@1.2.0) (2024-03-12)
 
 
