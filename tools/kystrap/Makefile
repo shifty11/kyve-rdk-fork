@@ -62,5 +62,3 @@ docker-image:
 	@echo "🐳 Building docker image..."
 	DOCKER_BUILDKIT=1 docker build --platform linux/$(ARCH) -t $(DOCKER_IMAGE_NAME):$(VERSION) .
 	@echo "✅ Completed docker image build!"
-
-

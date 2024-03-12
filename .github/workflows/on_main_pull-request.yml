@@ -6,14 +6,8 @@ on:
       - main
 
 jobs:
-#  checks:
-#    uses: ./.github/workflows/checks.yml
-#
-#  tests:
-#    uses: ./.github/workflows/tests.yml
-  pretend:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Pretend
-        run: echo "Pretend to run checks and tests"
+  checks:
+    uses: ./.github/workflows/checks.yml
 
+  tests:
+    uses: ./.github/workflows/tests.yml
