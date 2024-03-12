@@ -3,9 +3,18 @@ name: On main push
 on:
   push:
     branches: [ main ]
-    tags:
-      - '*'
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  releases:
-    uses: ./.github/workflows/releases.yml
+  # Create a release PR
+  create-release-pr:
+    name: "Create release PR"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          token: ${{ secrets.RDK_ACTION }}
+          skip-github-release: true
