@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/protocol/core@2.0.0...protocol/core@2.1.0) (2024-03-12)
+
+
+### Features
+
+* release dockerized RDK ([#48](https://github.com/shifty11/kyve-rdk-fork/issues/48)) ([be393aa](https://github.com/shifty11/kyve-rdk-fork/commit/be393aa368ccefed47b85f4b2a25a5618f13b1ad))
+
+## 2.0.0 (2024-03-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* breaking fix
+
+### Features
+
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* add direct-channel again (as test file) ([c0fef82](https://github.com/shifty11/kyve-rdk-fork/commit/c0fef821869e7afa857a3ddc34d4e32383921a86))
+* breaking fix ([4aa7fa0](https://github.com/shifty11/kyve-rdk-fork/commit/4aa7fa0fb89b223f5fe4ea227bc562a5e411f085))
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* expose metrics port ([9a9e16a](https://github.com/shifty11/kyve-rdk-fork/commit/9a9e16a709789a984dbdd3c5908ebfe5f6420e92))
+* fix some things ([f426185](https://github.com/shifty11/kyve-rdk-fork/commit/f426185f009c6101b454049a10c3e14f4d5e2161))
+* small bug in protocol ([6c2655a](https://github.com/shifty11/kyve-rdk-fork/commit/6c2655abe9094299972a11ab80a3c73723641071))
+* some stuff ([fa36901](https://github.com/shifty11/kyve-rdk-fork/commit/fa3690198190ce046349247f98812f83825e8d44))
+* the bug ([023e034](https://github.com/shifty11/kyve-rdk-fork/commit/023e034d0ccf82c95960f2139b21fd7759081ee9))
+
 ## [1.3.2](https://github.com/shifty11/kyve-rdk-fork/compare/protocol/core-v1.3.1...protocol/core@1.3.2) (2024-03-11)
 
 

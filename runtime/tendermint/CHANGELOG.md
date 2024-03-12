@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-v3.0.0...runtime/tendermint@3.1.0) (2024-03-12)
+
+
+### Features
+
+* release dockerized RDK ([#48](https://github.com/shifty11/kyve-rdk-fork/issues/48)) ([be393aa](https://github.com/shifty11/kyve-rdk-fork/commit/be393aa368ccefed47b85f4b2a25a5618f13b1ad))
+
+## [3.0.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-v2.0.0...runtime/tendermint@3.0.0) (2024-03-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* new fancy breaking change
+
+### Features
+
+* new stuff ([097cd53](https://github.com/shifty11/kyve-rdk-fork/commit/097cd53e39c91dc3072281d13fde4a807c84c5da))
+* release dockerized RDK ([#48](https://github.com/shifty11/kyve-rdk-fork/issues/48)) ([be393aa](https://github.com/shifty11/kyve-rdk-fork/commit/be393aa368ccefed47b85f4b2a25a5618f13b1ad))
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* e2e tests ([43542ce](https://github.com/shifty11/kyve-rdk-fork/commit/43542ce41082dfa87853e831ef76f2bfd9cef057))
+* new fancy breaking change ([6e18a52](https://github.com/shifty11/kyve-rdk-fork/commit/6e18a521670279919a47cbc7f17ed84ca1c46167))
+* the bug ([9ba3585](https://github.com/shifty11/kyve-rdk-fork/commit/9ba3585f540204e26b31378c3a327f596743f670))
+* typescript issues that broke the tests ([083aed8](https://github.com/shifty11/kyve-rdk-fork/commit/083aed882b8c497314ca5f0fa10026f471c6dac6))
+
+## 2.0.0 (2024-03-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* new fancy breaking change
+
+### Features
+
+* new stuff ([097cd53](https://github.com/shifty11/kyve-rdk-fork/commit/097cd53e39c91dc3072281d13fde4a807c84c5da))
+* set version in protocol and typescript runtimes ([c58721e](https://github.com/shifty11/kyve-rdk-fork/commit/c58721ee8d1fb18114dc00c8b07e7a304ed42152))
+
+
+### Bug Fixes
+
+* docker release ([0a8a5a3](https://github.com/shifty11/kyve-rdk-fork/commit/0a8a5a3be9671f619cdd7618f1e77eba35aef47e))
+* e2e tests ([43542ce](https://github.com/shifty11/kyve-rdk-fork/commit/43542ce41082dfa87853e831ef76f2bfd9cef057))
+* new fancy breaking change ([6e18a52](https://github.com/shifty11/kyve-rdk-fork/commit/6e18a521670279919a47cbc7f17ed84ca1c46167))
+* the bug ([9ba3585](https://github.com/shifty11/kyve-rdk-fork/commit/9ba3585f540204e26b31378c3a327f596743f670))
+* typescript issues that broke the tests ([083aed8](https://github.com/shifty11/kyve-rdk-fork/commit/083aed882b8c497314ca5f0fa10026f471c6dac6))
+
 ## [3.0.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-v2.0.0...runtime/tendermint-v3.0.0) (2024-03-11)
 
 
