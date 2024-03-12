@@ -85,7 +85,7 @@ jobs:
       - name: Remove the label from the pull request
         uses: actions-ecosystem/action-remove-labels@v1
         with:
-          lables: 'autorelease: pending'
+          labels: 'autorelease: pending'
       # Add `autorelease: tagged` label to the pull request
       - name: Add the label to the pull request
         uses: actions-ecosystem/action-add-labels@v1
