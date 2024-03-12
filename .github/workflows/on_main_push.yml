@@ -9,9 +9,9 @@ permissions:
   pull-requests: write
 
 jobs:
+  # Create a release PR
   create-release-pr:
-    # Do not run if the push was from release-please
-    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release-please--branches--main') }}
+    name: "Create release PR"
     runs-on: ubuntu-latest
     steps:
       - uses: google-github-actions/release-please-action@v4

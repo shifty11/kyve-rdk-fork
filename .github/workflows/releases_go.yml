@@ -18,11 +18,8 @@ jobs:
         with:
           #          ref: ${{ github.head_ref }}
           ref: main
-      # Print .release-please-manifest.json
-      - name: Print .release-please-manifest.json
-        run: cat .release-please-manifest.json | jq -r '.["tools/kysor"]'
-      # Get kysor version and save it to an environment variable
-      - name: Get kysor version
+      # Get version and save it to an environment variable
+      - name: Get ${{ inputs.working-dir }} version
         run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["{{ inputs.working-dir }}"]')" >> $GITHUB_ENV
       # Setup Golang from working directory
       - name: 🐿 Setup Golang
@@ -38,7 +35,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
       # Generate Release Body
       - name: Generate Release Body
-        run: npx extract-changelog-release  ${{ github.workspace }}/${{env.WORKING_DIR}}/CHANGELOG.md > RELEASE_BODY.md
+        run: npx extract-changelog-release  ${{ github.workspace }}/${{ inputs.working-dir }}/CHANGELOG.md > RELEASE_BODY.md
       # Print release body
       - name: Print release body
         run: cat RELEASE_BODY.md
@@ -51,7 +48,7 @@ jobs:
             github.rest.git.createRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: `refs/tags/tools/kysor@${VERSION}`,
+                ref: `refs/tags/${{ inputs.working-dir }}@${VERSION}`,
                 sha: context.sha
             })
       # Publish the Release
@@ -60,7 +57,7 @@ jobs:
         with:
           body_path: RELEASE_BODY.md
           files: ${{ inputs.working-dir }}/release/*
-          tag_name: tools/kysor@${{ env.VERSION }}
+          tag_name: ${{ inputs.working-dir }}@${{ env.VERSION }}
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
