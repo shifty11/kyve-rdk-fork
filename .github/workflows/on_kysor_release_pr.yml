@@ -81,29 +81,13 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Remove the label from the pull request
+      # Remove `autorelease: pending` label from the pull request
       - name: Remove the label from the pull request
-        uses: actions/github-script@v7
+        uses: actions-ecosystem/action-remove-labels@v1
         with:
-          script: |
-            github.issues.removeLabel({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'autorelease: pending'
-            })
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # Add the label to the pull request
+          lables: 'autorelease: pending'
+      # Add `autorelease: tagged` label to the pull request
       - name: Add the label to the pull request
-        uses: actions/github-script@v7
+        uses: actions-ecosystem/action-add-labels@v1
         with:
-          script: |
-              github.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['autorelease: tagged']
-              })
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          labels: 'autorelease: tagged'
