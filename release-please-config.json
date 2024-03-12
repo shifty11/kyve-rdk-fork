@@ -34,7 +34,9 @@
     },
     "tools/kystrap": {
       "release-type": "go",
-      "package-name": "tools/kystrap"
+      "package-name": "tools/kystrap",
+      "labels": ["testlabel"],
+      "release-labels": ["testlabel: release"]
     }
   }
 }
