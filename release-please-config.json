@@ -30,13 +30,13 @@
       "package-name": "tools/kysor",
       "separate-pull-requests": true,
       "skip-github-release": true,
-      "labels": ["go-release: pending"]
+      "label": "go-release: pending"
     },
     "tools/kystrap": {
       "release-type": "go",
       "package-name": "tools/kystrap",
-      "labels": ["testlabel"],
-      "release-labels": ["testlabel: release"]
+      "labels": "testlabel",
+      "release-label": "testlabel: release"
     }
   }
 }
