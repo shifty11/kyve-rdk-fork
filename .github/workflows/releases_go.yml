@@ -18,9 +18,12 @@ jobs:
         with:
           #          ref: ${{ github.head_ref }}
           ref: main
+      # Set working dir as env var
+      - name: Set working directory
+        run: echo "WORKING_DIR=${{ inputs.working-dir }}" >> $GITHUB_ENV
       # Get version and save it to an environment variable
       - name: Get ${{ inputs.working-dir }} version
-        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["{{ inputs.working-dir }}"]')" >> $GITHUB_ENV
+        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["'$WORKING_DIR'"]')" >> $GITHUB_ENV
       # Setup Golang from working directory
       - name: 🐿 Setup Golang
         uses: actions/setup-go@v4
@@ -35,7 +38,7 @@ jobs:
           VERSION: ${{ env.VERSION }}
       # Generate Release Body
       - name: Generate Release Body
-        run: npx extract-changelog-release  ${{ github.workspace }}/${{ inputs.working-dir }}/CHANGELOG.md > RELEASE_BODY.md
+        run: npx extract-changelog-release  ${{ github.workspace }}/$${{ env.WORKING_DIR }}/CHANGELOG.md > RELEASE_BODY.md
       # Print release body
       - name: Print release body
         run: cat RELEASE_BODY.md
@@ -44,11 +47,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const {VERSION} = process.env          
+            const {VERSION, WORKING_DIR} = process.env          
             github.rest.git.createRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: `refs/tags/${{ inputs.working-dir }}@${VERSION}`,
+                ref: `refs/tags/${WORKING_DIR}@${VERSION}`,
                 sha: context.sha
             })
       # Publish the Release
