@@ -29,8 +29,7 @@
       "release-type": "go",
       "package-name": "tools/kysor",
       "separate-pull-requests": true,
-      "skip-github-release": true,
-      "label": "go-release: pending"
+      "skip-github-release": true
     },
     "tools/kystrap": {
       "release-type": "go",
