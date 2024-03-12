@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.3.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap@1.2.0...tools/kystrap@1.3.0) (2024-03-12)
+
+
+### Features
+
+* new feature ([35ae1cc](https://github.com/shifty11/kyve-rdk-fork/commit/35ae1cca376b8bbd9e19962b9f2ea5ed6774468d))
+* release dockerized RDK ([#48](https://github.com/shifty11/kyve-rdk-fork/issues/48)) ([be393aa](https://github.com/shifty11/kyve-rdk-fork/commit/be393aa368ccefed47b85f4b2a25a5618f13b1ad))
+
+
+### Bug Fixes
+
+* fix some things ([f426185](https://github.com/shifty11/kyve-rdk-fork/commit/f426185f009c6101b454049a10c3e14f4d5e2161))
+* small change ([c30d96c](https://github.com/shifty11/kyve-rdk-fork/commit/c30d96c57d068de2bba2441ec5ceaa6a1631c15c))
+
 ## [1.2.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap-v1.1.0...tools/kystrap@1.2.0) (2024-03-12)
 
 
