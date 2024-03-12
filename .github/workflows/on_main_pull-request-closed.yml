@@ -1,0 +1,43 @@
+name: On main push
+
+#on:
+#  push:
+#    branches: [ main ]
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [ closed ]
+
+
+#jobs:
+#  releases:
+#    uses: ./.github/workflows/releases.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    # Only run if the push was from release-please created PR but not from the tools/kysor branch
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release-please--branches--main' && !github.event.pull_request.head.ref === 'release-please--branches--main--components--tools/kysor') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v4
+        with:
+          token: ${{ secrets.RDK_ACTION }}
+          skip-github-pull-request: true
+
+  release-kysor:
+    # Run only if the closed pull request is on the main branch and starts with 'release-please--branches--main--components--tools/kysor'
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release-please--branches--main--components--tools/kysor')
+    name: "Release Kysor"
+    with:
+      working-dir: tools/kysor
+    uses: ./.github/workflows/releases_go.yml
