@@ -34,14 +34,14 @@ ARCH ?= $(BUILDARCH)
 GO_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1,2)
 DOCKERFILE ?= Dockerfile
 VERSION ?= notset
-DOCKER_IMAGE_NAME=MySuperFancyGoRuntime
-BINARY_NAME ?= mysuperfancygoruntime-$(GOOS)-$(ARCH)
+DOCKER_IMAGE_NAME=my-fancy-go-runtime
+BINARY_NAME ?= my-fancy-go-runtime-$(GOOS)-$(ARCH)
 CGO_ENABLED=0
 
 ###############################################################################
 
 ldflags := $(LDFLAGS)
-ldflags += -X github.com/KYVENetwork/kyve-rdk/runtime/mysuperfancygoruntime/server.version=$(VERSION)
+ldflags += -X github.com/KYVENetwork/kyve-rdk/runtime/my-fancy-go-runtime/server.version=$(VERSION)
 ldflags := $(strip $(ldflags))
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
@@ -85,7 +85,7 @@ test:
 
 test-e2e:
 	@echo "🧪 Running end-to-end tests..."
-	@../../test/e2e/run-e2e-tests.sh "-test.run '/MySuperFancyGoRuntime\$$'"
+	@../../test/e2e/run-e2e-tests.sh "-test.run '/my-fancy-go-runtime\$$'"
 	@echo "✅ Completed end-to-end tests!"
 
 ###############################################################################

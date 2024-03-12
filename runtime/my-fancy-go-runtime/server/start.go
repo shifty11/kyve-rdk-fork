@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	pb "github.com/KYVENetwork/kyve-rdk/runtime/MySuperFancyGoRuntime/proto/kyverdk/runtime/v1"
+	pb "github.com/KYVENetwork/kyve-rdk/runtime/my-fancy-go-runtime/proto/kyverdk/runtime/v1"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -25,10 +25,10 @@ func StartServer() {
 	server := grpc.NewServer(grpc.MaxRecvMsgSize(maxMessageSize), grpc.MaxSendMsgSize(maxMessageSize))
 
 	// Register the Tendermint service with the gRPC server
-	pb.RegisterRuntimeServiceServer(server, &MysuperfancygoruntimeServer{})
+	pb.RegisterRuntimeServiceServer(server, &MyFancyGoRuntimeServer{})
 
 	// Start serving incoming connections
-	fmt.Printf("🌐 MysuperfancygoruntimeServer is running on on http://%s:%s...\nPress Ctrl + C to exit.\n", host, port)
+	fmt.Printf("🌐 MyFancyGoRuntimeServer is running on on http://%s:%s...\nPress Ctrl + C to exit.\n", host, port)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Fatalf("Failed to serve gRPC server: %v", err)

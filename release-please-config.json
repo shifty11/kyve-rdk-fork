@@ -11,8 +11,8 @@
       "package-name": "protocol/core",
       "release-type": "node"
     },
-    "runtime/MySuperFancyGoRuntime": {
-      "package-name": "runtime/MySuperFancyGoRuntime",
+    "runtime/my-fancy-go-runtime": {
+      "package-name": "runtime/my-fancy-go-runtime",
       "release-type": "go"
     },
     "runtime/tendermint": {

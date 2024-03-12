@@ -1,4 +1,4 @@
-module github.com/KYVENetwork/kyve-rdk/runtime/MySuperFancyGoRuntime
+module github.com/KYVENetwork/kyve-rdk/runtime/my-fancy-go-runtime
 
 go 1.22.0
 

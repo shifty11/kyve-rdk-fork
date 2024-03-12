@@ -4,18 +4,18 @@ import (
 	"context"
 	"encoding/json"
 	bundlestypes "github.com/KYVENetwork/chain/x/bundles/types"
-	pb "github.com/KYVENetwork/kyve-rdk/runtime/MySuperFancyGoRuntime/proto/kyverdk/runtime/v1"
+	pb "github.com/KYVENetwork/kyve-rdk/runtime/my-fancy-go-runtime/proto/kyverdk/runtime/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"reflect"
 	"strconv"
 )
 
-const name = "runtime/mysuperfancygoruntime"
+const name = "runtime/my-fancy-go-runtime"
 
 var version = "(none)" // will be set by build command
 
-type MysuperfancygoruntimeServer struct {
+type MyFancyGoRuntimeServer struct {
 	pb.RuntimeServiceServer
 }
 
@@ -26,25 +26,25 @@ type Config struct {
 	// Rpc string `json:"rpc"`
 }
 
-type MysuperfancygoruntimeItemValue struct {
+type MyFancyGoRuntimeItemValue struct {
 	// TODO: Define data properties here
 	// Example:
 	// Block interface{} `json:"block"`
 }
 
-type MysuperfancygoruntimeTransformedItemValue struct {
+type MyFancyGoRuntimeTransformedItemValue struct {
 	// TODO: Define data properties here
 	// Example:
 	// Block interface{} `json:"block"`
 }
 
 // GetRuntimeName returns the name of the runtime. Example "runtime/tendermint"
-func (t *MysuperfancygoruntimeServer) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
+func (t *MyFancyGoRuntimeServer) GetRuntimeName(ctx context.Context, req *pb.GetRuntimeNameRequest) (*pb.GetRuntimeNameResponse, error) {
 	return &pb.GetRuntimeNameResponse{Name: name}, nil
 }
 
 // GetRuntimeVersion returns the version of the runtime. Example "1.2.0"
-func (t *MysuperfancygoruntimeServer) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
+func (t *MyFancyGoRuntimeServer) GetRuntimeVersion(ctx context.Context, req *pb.GetRuntimeVersionRequest) (*pb.GetRuntimeVersionResponse, error) {
 	return &pb.GetRuntimeVersionResponse{Version: version}, nil
 }
 
@@ -54,7 +54,7 @@ func (t *MysuperfancygoruntimeServer) GetRuntimeVersion(ctx context.Context, req
 // the specific runtime config is not parsable or invalid.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
+func (t *MyFancyGoRuntimeServer) ValidateSetConfig(ctx context.Context, req *pb.ValidateSetConfigRequest) (*pb.ValidateSetConfigResponse, error) {
 	rawConfig := req.GetRawConfig()
 	var config Config
 	err := json.Unmarshal([]byte(rawConfig), &config)
@@ -70,7 +70,7 @@ func (t *MysuperfancygoruntimeServer) ValidateSetConfig(ctx context.Context, req
 
 	// TODO: make changes to config if necessary
 	// Example:
-	// if value, exists := os.LookupEnv("KYVE_RUNTIME_MYSUPERFANCYGORUNTIME_API"); exists {
+	// if value, exists := os.LookupEnv("KYVE_RUNTIME_MY-FANCY-GO-RUNTIME_API"); exists {
 	//	 config["rpc"] = value
 	// }
 
@@ -84,7 +84,7 @@ func (t *MysuperfancygoruntimeServer) ValidateSetConfig(ctx context.Context, req
 // GetDataItem gets the data item from a specific key and returns both key and the value.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
+func (t *MyFancyGoRuntimeServer) GetDataItem(ctx context.Context, req *pb.GetDataItemRequest) (*pb.GetDataItemResponse, error) {
 	var config Config
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
@@ -103,7 +103,7 @@ func (t *MysuperfancygoruntimeServer) GetDataItem(ctx context.Context, req *pb.G
 	//	 "block":         blockResponse["result"],
 	// }
 
-	var value = map[string]MysuperfancygoruntimeItemValue{}
+	var value = map[string]MyFancyGoRuntimeItemValue{}
 
 	parsedJson, err := json.Marshal(value)
 	if err != nil {
@@ -120,14 +120,14 @@ func (t *MysuperfancygoruntimeServer) GetDataItem(ctx context.Context, req *pb.G
 // of proposals or bundle validation.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
+func (t *MyFancyGoRuntimeServer) PrevalidateDataItem(ctx context.Context, req *pb.PrevalidateDataItemRequest) (*pb.PrevalidateDataItemResponse, error) {
 	var config map[string]string
 	err := json.Unmarshal([]byte(req.GetConfig().GetSerializedConfig()), &config)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling serializedConfig JSON string: %v", err)
 	}
 
-	var itemValue MysuperfancygoruntimeItemValue
+	var itemValue MyFancyGoRuntimeItemValue
 	err = json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
@@ -146,8 +146,8 @@ func (t *MysuperfancygoruntimeServer) PrevalidateDataItem(ctx context.Context, r
 // to remove unecessary data or format the data in a better way.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
-	var itemValue MysuperfancygoruntimeItemValue
+func (t *MyFancyGoRuntimeServer) TransformDataItem(ctx context.Context, req *pb.TransformDataItemRequest) (*pb.TransformDataItemResponse, error) {
+	var itemValue MyFancyGoRuntimeItemValue
 	err := json.Unmarshal([]byte(req.GetDataItem().GetValue()), &itemValue)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
@@ -173,12 +173,12 @@ func (t *MysuperfancygoruntimeServer) TransformDataItem(ctx context.Context, req
 // ValidateDataItem validates a single data item of a bundle proposal
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
+func (t *MyFancyGoRuntimeServer) ValidateDataItem(ctx context.Context, req *pb.ValidateDataItemRequest) (*pb.ValidateDataItemResponse, error) {
 	requestProposedDataItem := req.GetProposedDataItem()
 	requestValidationDataItem := req.GetValidationDataItem()
 
-	var proposed MysuperfancygoruntimeTransformedItemValue
-	var validation MysuperfancygoruntimeTransformedItemValue
+	var proposed MyFancyGoRuntimeTransformedItemValue
+	var validation MyFancyGoRuntimeTransformedItemValue
 	err := json.Unmarshal([]byte(requestProposedDataItem.GetValue()), &proposed)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling proposedDataItem: %v", err)
@@ -205,14 +205,14 @@ func (t *MysuperfancygoruntimeServer) ValidateDataItem(ctx context.Context, req 
 // String should not be longer than 100 characters, else gas costs might be too expensive.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
+func (t *MyFancyGoRuntimeServer) SummarizeDataBundle(ctx context.Context, req *pb.SummarizeDataBundleRequest) (*pb.SummarizeDataBundleResponse, error) {
 	grpcBundle := req.GetBundle()
 	if len(grpcBundle) == 0 {
 		return nil, status.Error(codes.Internal, "Bundle is empty")
 	}
 
 	latestBundle := grpcBundle[len(grpcBundle)-1]
-	var value MysuperfancygoruntimeTransformedItemValue
+	var value MyFancyGoRuntimeTransformedItemValue
 	err := json.Unmarshal([]byte(latestBundle.GetValue()), &value)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Error unmarshalling data item: %v", err)
@@ -229,7 +229,7 @@ func (t *MysuperfancygoruntimeServer) SummarizeDataBundle(ctx context.Context, r
 // NextKey gets the next key from the current key so that the data archived has an order.
 //
 // Deterministic behavior is required
-func (t *MysuperfancygoruntimeServer) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
+func (t *MyFancyGoRuntimeServer) NextKey(ctx context.Context, req *pb.NextKeyRequest) (*pb.NextKeyResponse, error) {
 	key := req.GetKey()
 	parsedKey, err := strconv.Atoi(key)
 	if err != nil {

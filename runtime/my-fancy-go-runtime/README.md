@@ -1,6 +1,6 @@
-# Mysuperfancygoruntime Runtime Server
+# My-Fancy-Go-Runtime Runtime Server
 
-This is the Mysuperfancygoruntime runtime server.
+This is the My-Fancy-Go-Runtime runtime server.
 
 ## Development
 
@@ -125,7 +125,7 @@ The name of the file doesn't matter in this case.
 <details>
 <summary>Config</summary>
 Change the config in `testdata/config.yaml` to match your environment.
-The REST server with your testdata is reachable under `http://kyve-e2e-test-testapi-runtime-mysuperfancygoruntime:8080`
+The REST server with your testdata is reachable under `http://kyve-e2e-test-testapi-runtime-my-fancy-go-runtime:8080`
 </details>
 
 📌 **Tasks**
