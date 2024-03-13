@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.1.1](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint@3.1.0...runtime/tendermint@3.1.1) (2024-03-13)
+
+
+### Bug Fixes
+
+* update CI/CD ([de2e811](https://github.com/shifty11/kyve-rdk-fork/commit/de2e8114ab4fec15349558ecbfc395483a98de4b))
+
 ## [3.1.0](https://github.com/shifty11/kyve-rdk-fork/compare/runtime/tendermint-v3.0.0...runtime/tendermint@3.1.0) (2024-03-12)
 
 
