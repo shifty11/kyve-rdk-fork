@@ -41,11 +41,6 @@ jobs:
             console.log(`Release created: ${RELEASE_CREATED}`)
             console.log(`Release output: ${RELEASE_OUTPUT}`)
             
-            if (RELEASE_CREATED) {
-              const rc = JSON.parse(RELEASE_CREATED)
-              console.log(`Release created: ${rc}`)
-            }
-            
             if (RELEASE_OUTPUT) {
               const ro = JSON.parse(RELEASE_OUTPUT)
               console.log(`Release output: ${ro}`)
