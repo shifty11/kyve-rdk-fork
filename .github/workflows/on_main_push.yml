@@ -21,6 +21,12 @@ jobs:
       - uses: google-github-actions/release-please-action@v4
         id: release
 
+      # Checkout the repository
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: "test gh upload"
+        run: gh release upload "tools/kysor@2.0.16" LICENSE
+
   release-kysor:
     name: "Release kysor"
     needs: release
