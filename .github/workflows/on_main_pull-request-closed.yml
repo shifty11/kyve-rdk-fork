@@ -31,7 +31,7 @@ jobs:
       - name: ${{ steps.release.outputs.releases_created }}
         run: echo "RELEASE_CREATED=${{ steps.release.outputs.releases_created }}"
       - name: Release kysor
-        if: ${{ steps.release.outputs.tools/kysor--release_created }}
+#        if: ${{ steps.release.outputs.tools/kysor--release_created }}
         run: echo "RELEASE_CREATED=${{ steps.release.outputs.tools/kysor--release_created }}"
 
 
