@@ -24,7 +24,7 @@ jobs:
       - name: "test gh upload"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload "tools/kysor@2.0.16" *.json
+        run: gh release upload "tools/kysor@2.0.16" runtime/tendermint/*.json
       - uses: google-github-actions/release-please-action@v4
         id: release
 
