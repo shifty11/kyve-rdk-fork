@@ -42,15 +42,21 @@ jobs:
 #      - name: Get ${{ inputs.working-dir }} version
 #        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
 #        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["'$WORKING_DIR'"]')" >> $GITHUB_ENV
+
+      # Checkout the repository
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
       # Setup Golang from working directory
       - name: 🐿 Setup Golang
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
         uses: actions/setup-go@v4
         with:
-          go-version-file: 'tools/kysor/go.mod'
-          cache-dependency-path: 'tools/kysor/go.sum'
-#          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
-#          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
+#          go-version-file: 'tools/kysor/go.mod'
+#          cache-dependency-path: 'tools/kysor/go.sum'
+          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
+          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
       # Build
       - name: Build
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
