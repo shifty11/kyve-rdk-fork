@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.1](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap@1.5.0...tools/kystrap@1.5.1) (2024-03-13)
+
+
+### Bug Fixes
+
+* add newline ([5e9c3a5](https://github.com/shifty11/kyve-rdk-fork/commit/5e9c3a5b4e04064867925fded8b28c892304d509))
+* add newline ([7f7aff7](https://github.com/shifty11/kyve-rdk-fork/commit/7f7aff7073ae721fd62eb5e50d39d9d90c5161b8))
+* add newline ([4e5be4e](https://github.com/shifty11/kyve-rdk-fork/commit/4e5be4eafa37cf12e34eeb384f3579b42fd8b07f))
+* add newline ([9b2fae1](https://github.com/shifty11/kyve-rdk-fork/commit/9b2fae15003bd6791716b81b6af20ca3463a820d))
+* update CI/CD ([c012862](https://github.com/shifty11/kyve-rdk-fork/commit/c0128629305fe6ccd8e951c7dc7765926fa246dc))
+* update CI/CD ([f4ca079](https://github.com/shifty11/kyve-rdk-fork/commit/f4ca079719e8208aaac1815425584e5626ec728e))
+* update CI/CD ([1cf32fa](https://github.com/shifty11/kyve-rdk-fork/commit/1cf32fabfd5cb9bec5bf83b1cd70bdf4292bece8))
+
 ## [1.5.0](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kystrap@1.4.0...tools/kystrap@1.5.0) (2024-03-13)
 
 
