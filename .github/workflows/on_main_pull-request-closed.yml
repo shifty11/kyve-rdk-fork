@@ -61,17 +61,5 @@ jobs:
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
-        run: gh release upload ${{ steps.release.outputs['tools/kysor--tag-name'] }} ./release/*
-
-#  release-kysor:
-#    name: "Release Kysor"
-#    # Run only if the closed PR was from the tools/kysor branch
-#    if: |
-#      github.event_name == 'pull_request' &&
-#      github.event.action == 'closed' &&
-#      github.event.pull_request.base.ref == 'main' &&
-#      startsWith(github.event.pull_request.head.ref, 'release-please--branches--main--components--tools/kysor')
-#    with:
-#      working-dir: tools/kysor
-#    uses: ./.github/workflows/releases_go.yml
+#        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
+        run: gh release upload ${{ steps.release.outputs['tools/kysor--tag-name'] }} ${{ steps.release.outputs['tools/kysor--path'] }}/release/*
