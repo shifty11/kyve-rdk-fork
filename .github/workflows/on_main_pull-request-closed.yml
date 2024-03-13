@@ -34,6 +34,35 @@ jobs:
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
         run: echo "RELEASE_CREATED=${{ steps.release.outputs['tools/kysor--release_created'] }}"
 
+      # Set working dir as env var
+      - name: Set working directory
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        run: echo "WORKING_DIR=${{ inputs.working-dir }}" >> $GITHUB_ENV
+      # Get version and save it to an environment variable
+      - name: Get ${{ inputs.working-dir }} version
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        run: echo "VERSION=$(cat .release-please-manifest.json | jq -r '.["'$WORKING_DIR'"]')" >> $GITHUB_ENV
+      # Setup Golang from working directory
+      - name: 🐿 Setup Golang
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
+          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
+      # Build
+      - name: Build
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        run: make release
+        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
+        env:
+          VERSION: ${{ steps.release.outputs['tools/kysor--version'] }}
+      # Upload Release Artifact
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
+        run: gh release upload ${{ steps.release.outputs.tag_name }} ./release/*
 
 #  release-kysor:
 #    name: "Release Kysor"
