@@ -6,6 +6,7 @@
 ### Features
 
 * release dockerized RDK ([#48](https://github.com/shifty11/kyve-rdk-fork/issues/48)) ([be393aa](https://github.com/shifty11/kyve-rdk-fork/commit/be393aa368ccefed47b85f4b2a25a5618f13b1ad))
+* update CI/CD ([d6bfd40](https://github.com/shifty11/kyve-rdk-fork/commit/d6bfd408c749d7d8cd93c54bd7d4f2b0172b4268))
 
 
 ### Bug Fixes
