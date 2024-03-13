@@ -34,40 +34,32 @@ jobs:
 #        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
 #        run: echo "RELEASE_CREATED=${{ steps.release.outputs['tools/kysor--release_created'] }}"
 
-      - name: Release kysor
+      # Checkout the repository
+      - name: Checkout the repository
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-        uses: ./.github/workflows/releases_go.yml
+        uses: actions/checkout@v4
         with:
-          working-dir: ${{ steps.release.outputs['tools/kysor--path'] }}
-          version: ${{ steps.release.outputs['tools/kysor--version'] }}
-          tag-name: ${{ steps.release.outputs['tools/kysor--tag-name'] }}
-
-#      # Checkout the repository
-#      - name: Checkout the repository
-#        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-#        uses: actions/checkout@v4
-#        with:
-#          ref: main
-#      # Setup Golang from working directory
-#      - name: 🐿 Setup Golang
-#        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-#        uses: actions/setup-go@v4
-#        with:
-##          go-version-file: 'tools/kysor/go.mod'
-##          cache-dependency-path: 'tools/kysor/go.sum'
-#          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
-#          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
-#      # Build
-#      - name: Build
-#        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-#        run: make release
+          ref: main
+      # Setup Golang from working directory
+      - name: 🐿 Setup Golang
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        uses: actions/setup-go@v4
+        with:
+#          go-version-file: 'tools/kysor/go.mod'
+#          cache-dependency-path: 'tools/kysor/go.sum'
+          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
+          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
+      # Build
+      - name: Build
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        run: make release
+        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
+        env:
+          VERSION: ${{ steps.release.outputs['tools/kysor--version'] }}
+      # Upload Release Artifact
+      - name: Upload Release Artifact
+        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
-#        env:
-#          VERSION: ${{ steps.release.outputs['tools/kysor--version'] }}
-#      # Upload Release Artifact
-#      - name: Upload Release Artifact
-#        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-##        working-directory: ${{ steps.release.outputs['tools/kysor--path'] }}
-#        run: gh release upload ${{ steps.release.outputs['tools/kysor--tag-name'] }} ${{ steps.release.outputs['tools/kysor--path'] }}/release/*
+        run: gh release upload ${{ steps.release.outputs['tools/kysor--tag-name'] }} ${{ steps.release.outputs['tools/kysor--path'] }}/release/kysor-linux-arm64
