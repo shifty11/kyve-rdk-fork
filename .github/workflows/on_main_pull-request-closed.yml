@@ -47,8 +47,8 @@ jobs:
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
         uses: actions/setup-go@v4
         with:
-          go-version-file: ./tools/kysor/go.mod
-          cache-dependency-path: ./tools/kysor/go.sum
+          go-version-file: tools/kysor/go.mod
+          cache-dependency-path: tools/kysor/go.sum
 #          go-version-file: ${{ steps.release.outputs['tools/kysor--path'] }}/go.mod
 #          cache-dependency-path: ${{ steps.release.outputs['tools/kysor--path'] }}/go.sum
       # Build
