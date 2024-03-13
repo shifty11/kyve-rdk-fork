@@ -18,14 +18,15 @@ jobs:
       kysor-version: ${{ steps.release.outputs['tools/kysor--version'] }}
       kysor-tag-name: ${{ steps.release.outputs['tools/kysor--tag-name'] }}
     steps:
-      - uses: google-github-actions/release-please-action@v4
-        id: release
-
       # Checkout the repository
       - name: Check out repository code
         uses: actions/checkout@v4
       - name: "test gh upload"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload "tools/kysor@2.0.16" LICENSE
+      - uses: google-github-actions/release-please-action@v4
+        id: release
 
   release-kysor:
     name: "Release kysor"
