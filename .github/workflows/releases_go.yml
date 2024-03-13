@@ -37,6 +37,4 @@ jobs:
       - name: Upload Release Artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        working-directory: ${{ inputs.working-dir  }}
-#        run: gh release upload ${{ inputs.tag-name }} ./release/*
-        run: gh release upload ${{ inputs.tag-name }} ${{ inputs.working-dir }}/release/kysor-linux-arm64
+        run: gh release upload ${{ inputs.tag-name }} ${{ inputs.working-dir }}/release/*
