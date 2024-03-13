@@ -32,6 +32,8 @@ jobs:
         run: echo "RELEASE_CREATED=${{ steps.release.outputs.release_created }}"
       - name: Save output to file
         run: echo "RELEASE_OUTPUT=${{ steps.release.outputs }}" >> $GITHUB_ENV
+      - name: ${{ steps.release.outputs.releases_created }}
+        run: echo "RELEASE_CREATED=${{ steps.release.outputs.releases_created }}"
       - name: Print output
 #        if: ${{ steps.release.outputs.release_created }}
         uses: actions/github-script@v7
