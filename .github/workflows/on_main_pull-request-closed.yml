@@ -25,8 +25,8 @@ jobs:
           token: ${{ secrets.RDK_ACTION }}
           skip-github-pull-request: true
       - name: Print output
-        if: ${{ steps.release.outputs.release_created }}
-        run: echo "${{ steps.release.outputs.tag_name }}"
+#        if: ${{ steps.release.outputs.release_created }}
+        run: echo "${{ steps.release.outputs }}"
 
   release-kysor:
     name: "Release Kysor"
