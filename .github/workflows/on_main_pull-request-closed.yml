@@ -28,17 +28,15 @@ jobs:
 #        with:
 #          token: ${{ secrets.RDK_ACTION }}
 #          skip-github-pull-request: true
+      - name: Save output to env var
+        run: echo "RELEASE_CREATED=${{ steps.release.outputs.release_created }}" >> $GITHUB_ENV
       - name: Print output
 #        if: ${{ steps.release.outputs.release_created }}
         uses: actions/github-script@v7
         with:
           script: |
-            console.log(JSON.stringify(context.payload, null, 2))
-            console.log(JSON.stringify(github, null, 2))
-            console.log(JSON.stringify(steps, null, 2))
-            console.log(JSON.stringify(steps.release, null, 2))
-            console.log(JSON.stringify(steps.release.outputs, null, 2))
-            console.log(JSON.stringify(steps.release.outputs.release_created, null, 2))
+            const {RELEASE_CREATED} = process.env
+            console.log(`Release created: ${RELEASE_CREATED}`)
         
 
 #  release-kysor:
