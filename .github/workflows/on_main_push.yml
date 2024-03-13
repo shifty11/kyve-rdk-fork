@@ -16,7 +16,7 @@ jobs:
       kysor-released: ${{ steps.release.outputs['tools/kysor--release_created'] }}
       kysor-path: ${{ steps.release.outputs['tools/kysor--path'] }}
       kysor-version: ${{ steps.release.outputs['tools/kysor--version'] }}
-      kysor-tag-name: ${{ steps.release.outputs['tools/kysor--tag-name'] }}
+      kysor-tag-name: ${{ steps.release.outputs['tools/kysor--tag_name'] }}
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
