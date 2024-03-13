@@ -71,7 +71,7 @@ jobs:
 
   release-kysor:
     name: "Release kysor"
-    needs: [release]
+    needs: release
     if: ${{ needs.release.outputs.kysor-released }}
     uses: ./.github/workflows/releases_go.yml
     with:
