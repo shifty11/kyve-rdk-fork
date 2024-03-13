@@ -28,26 +28,12 @@ jobs:
 #        with:
 #          token: ${{ secrets.RDK_ACTION }}
 #          skip-github-pull-request: true
-      - name: Save output to env var
-        run: echo "RELEASE_CREATED=${{ steps.release.outputs.release_created }}"
-      - name: Save output to file
-        run: echo "RELEASE_OUTPUT=${{ steps.release.outputs }}" >> $GITHUB_ENV
       - name: ${{ steps.release.outputs.releases_created }}
         run: echo "RELEASE_CREATED=${{ steps.release.outputs.releases_created }}"
-      - name: Print output
-#        if: ${{ steps.release.outputs.release_created }}
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const {RELEASE_CREATED, RELEASE_OUTPUT} = process.env
-            console.log(`Release created: ${RELEASE_CREATED}`)
-            console.log(`Release output: ${RELEASE_OUTPUT}`)
-            
-            if (RELEASE_OUTPUT) {
-              const ro = JSON.parse(RELEASE_OUTPUT)
-              console.log(`Release output: ${ro}`)
-            }
-        
+      - name: Release kysor
+        if: ${{ steps.release.outputs.tools/kysor--release_created }}
+        run: echo "RELEASE_CREATED=${{ steps.release.outputs.tools/kysor--release_created }}"
+
 
 #  release-kysor:
 #    name: "Release Kysor"
