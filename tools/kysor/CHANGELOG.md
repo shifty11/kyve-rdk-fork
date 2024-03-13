@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.14](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor@2.0.13...tools/kysor@2.0.14) (2024-03-13)
+
+
+### Bug Fixes
+
+* add newline ([cf1a3b8](https://github.com/shifty11/kyve-rdk-fork/commit/cf1a3b806db817743895e12fee72a6c51058cbeb))
+
 ## [2.0.13](https://github.com/shifty11/kyve-rdk-fork/compare/tools/kysor@2.0.12...tools/kysor@2.0.13) (2024-03-13)
 
 
