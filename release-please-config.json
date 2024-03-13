@@ -34,9 +34,7 @@
     "tools/kysor": {
       "initial-version": "2.0.0",
       "package-name": "tools/kysor",
-      "release-type": "go",
-      "separate-pull-requests": true,
-      "skip-github-release": true
+      "release-type": "go"
     },
     "tools/kystrap": {
       "package-name": "tools/kystrap",
