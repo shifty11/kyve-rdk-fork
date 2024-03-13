@@ -34,13 +34,6 @@ jobs:
 #        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
 #        run: echo "RELEASE_CREATED=${{ steps.release.outputs['tools/kysor--release_created'] }}"
 
-      # Checkout the repository
-      - name: Checkout the repository
-        if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
-        uses: actions/checkout@v4
-        with:
-          ref: main
-
       - name: Release kysor
         if: ${{ steps.release.outputs['tools/kysor--release_created'] }}
         uses: ./.github/workflows/releases_go.yml
